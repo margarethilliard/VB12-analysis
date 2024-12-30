@@ -22,6 +22,6 @@ Scripts used in the analysis of vitamin B12 data for the USDA Nutritional Phenot
 ### Step 5: compute B12 sythesis and utilization scores in R 
 - Scripts to reproduce this step of the workflow are located in "~/scripts/VB12_scores/"
 
-#### A note on computing environments
+### A note on computing environments
 - Steps 2-4 were run on Spitfire, a slurm-based HPC cluster managed by the UC Davis Genome Center 
 - Step 5-6 were run locally in R on a MacBook Pro using a Apple M3 Max chip 
