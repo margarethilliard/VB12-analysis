@@ -2,10 +2,10 @@
 Scripts used in the analysis of vitamin B12 data for the USDA Nutritional Phenotyping Study
 
 ### Step 1: Download required software 
-- [R](https://www.r-project.org/) 4.2 (or newer)
+- [R 4.2](https://www.r-project.org/) (or newer)
 - [RStudio](https://posit.co/download/rstudio-desktop/) '2024.04.2+764' (or newer)
 - [Python 3.9.13](https://www.anaconda.com/download)
-- [bbmap](https://sourceforge.net/projects/bbmap/)
+- [BBMap](https://sourceforge.net/projects/bbmap/)
 - [TaxaHFE version 2.2](https://github.com/aoliver44/taxaHFE) I'm currently using the development branch...
 - [dietML](https://github.com/aoliver44/nutrition_tools) 
 
