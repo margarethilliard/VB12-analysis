@@ -5,9 +5,9 @@ Scripts used in the analysis of vitamin B12 data for the USDA Nutritional Phenot
 - R 4.2.2 (or newer)
 - RStudio 'version' (or newer)
 - Python 3.9.13
-- (bbmap)[https://sourceforge.net/projects/bbmap/] 
-- TaxaHFE version 2.0
-- dietML
+- [bbmap](https://sourceforge.net/projects/bbmap/)
+- [TaxaHFE version 2.2] (https://github.com/aoliver44/taxaHFE) (I'm currently using the development branch)
+- [dietML] (https://github.com/aoliver44/nutrition_tools) 
 
 ### Step 2: Create the custom prokaryotic vitamin B12 amino acid database (optional)
 - Scripts to reproduce this step of the workflow are located in "scripts/custom_database/"
