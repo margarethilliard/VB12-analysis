@@ -3,12 +3,13 @@ Scripts used in the analysis of vitamin B12 data for the USDA Nutritional Phenot
 
 ### Step 1: Download required software 
 - [wget](https://www.gnu.org/software/wget/)
+- [DIAMOND](https://github.com/bbuchfink/diamond)
+- [BBMap](https://sourceforge.net/projects/bbmap/)
+- [Python 3.9.13](https://www.anaconda.com/download)
+- [parallel](https://www.gnu.org/software/parallel/man.html) (optional)
 - [R 4.2](https://www.r-project.org/) (or newer)
 - [RStudio](https://posit.co/download/rstudio-desktop/) '2024.04.2+764' (or newer)
-- [DIAMOND](https://github.com/bbuchfink/diamond)
-- [Python 3.9.13](https://www.anaconda.com/download)
-- [BBMap](https://sourceforge.net/projects/bbmap/)
-- [TaxaHFE version 2.2](https://github.com/aoliver44/taxaHFE) I'm currently using the development branch...
+- [TaxaHFE 2.2](https://github.com/aoliver44/taxaHFE) (currently using the dev branch)
 - [dietML](https://github.com/aoliver44/nutrition_tools) 
 
 ### Step 2: Create the custom prokaryotic vitamin B12 amino acid database (optional)
