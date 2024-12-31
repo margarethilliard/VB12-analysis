@@ -1,0 +1,12 @@
+## Diet and Microbiome Predictors of Plasma Vitamin B12 in Healthy U.S. Adults
+Scripts used to find amino acids related to vitamin B12 synthesis in fecal metagenome (merged) reads 
+
+## Step 1: run 01_make_scripts.sh to build DIMAOND DB and make scripts 
+- input: database/final_db.faa, path_file.txt 
+- output: scripts/*.sh
+- usage: bash 01_make_scripts.sh
+
+## Step 2: run your scripts in parallel 
+- input: scripts/*.sh
+- output: output/*.txt
+- usage: parallel -j 4 ::: ./scripts/*.sh
