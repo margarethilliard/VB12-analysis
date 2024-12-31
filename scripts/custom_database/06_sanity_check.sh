@@ -15,8 +15,8 @@
 ##########################################################
 
 ## set directory and file paths
-WORKDIR=/share/lemaylab-backedup/mhilliard/B12_database
-
+WORKDIR=/share/lemaylab-backedup/mhilliard/B12_database/
+DB=database/B12_reference_db_no_eukaryotes.faa # relative to workdir
 cd ${WORKDIR}
 
 echo 'Getting taxonomic info from KEGG API...'
@@ -58,7 +58,11 @@ total_N=$(cat db_taxa_with_eukaryotes.txt | cut -f1 | sort | uniq | wc -l)
 ## get !eukaryote N (prokaryotes + archaea)
 not_eukaryotes_N=$(cat db_taxa_no_eukaryotes.txt| cut -f1 | sort | uniq | wc -l)
 
-echo " ${total_N} should = ${eukaryotes_N} + ${not_eukaryotes_N} -- does it?? "
+if [ $((eukaryotes_N + not_eukaryotes_N)) -eq $total_N ]; then
+  echo "Number of eukaryotic taxa ($eukaryotes_N) plus prokaryotic taxa ($not_eukaryotes_N) is equal to expected output number ($total_N)"
+else
+  echo "Number of eukaryotic taxa plus prokaryotic taxa does not equal the expected total number of taxa... please investigate."
+fi
 
 ## remove intermediate files
 rm eukaryotic-taxa.txt db_taxa_no_eukaryotes.txt db_taxa_with_eukaryotes.txt kegg_orgs.txt

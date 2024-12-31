@@ -1,52 +1,52 @@
 ## Diet and Microbiome Predictors of Plasma Vitamin B12 in Healthy U.S. Adults
 Scripts used to build the custom prokaryotic vitamin B12 amino acid database 
 
-### Step 1: run 01_build_custom_db.sh to get amino acid sequences from KEGG API using wget
-- input files are: B12_genes_with_EC_numbers.txt, B12_genes_with_KEGG_ID.txt, B12_genes_with_K_numbers.txt
-- output file is: database/B12_reference_db_with_eukaryotes.faa
+## Step 1: run 01_build_custom_db.sh to get amino acid sequences from KEGG API using wget
+- input: B12_genes_with_EC_numbers.txt, B12_genes_with_KEGG_ID.txt, B12_genes_with_K_numbers.txt
+- output: database/B12_reference_db_with_eukaryotes.faa
 - usage: bash 01_build_custom_db.sh (change the work directory)
 
 ## Step 2: run 02_sanity_check.sh compare the expected number of enzymes (queried via wget) with the number of enzymes writted to custom KEGG database
-- input files are: KO_to_geneID.txt, B12_genes_with_KEGG_ID.txt
-- output file is: gene_IDs_to_append.txt
+- input: KO_to_geneID.txt, B12_genes_with_KEGG_ID.txt
+- output: gene_IDs_to_append.txt
 - usage: bash 02_sanity_check.sh (change the work directory)
 
 ## Step 3: run 03_append_missing_geneIDs.sh to append missing geneIDs to custom KEGG database file
-- input files is: gene_IDs_to_append.txt
-- output file is: database/B12_reference_db_with_eukaryotes.faa
+- input: gene_IDs_to_append.txt
+- output: database/B12_reference_db_with_eukaryotes.faa
 - usage: bash 03_append_missing_geneIDs.sh (change the work directory)
 
 ## Step 4: run 04_get_taxa_from_db.sh run list unique organisms and their higher level taxonomic rank from a custom KEGG database
-- input file: n/a 
-- output file: db_taxa_with_eukaryotes.txt
+- input: database/B12_reference_db_with_eukaryotes.faa
+- output: db_taxa_with_eukaryotes.txt
 - usage: bash 04_get_taxa_from_db.sh
 
 ## Step 5: run 05_filter_by_taxa_name_bbmap.sh to remove eukaryotic organisms from a custom KEGG database
-- input file: db_taxa_with_eukaryotes.txt
-- output file: database/B12_reference_db_no_eukaryotes.faa
+- input: db_taxa_with_eukaryotes.txt
+- output: database/B12_reference_db_no_eukaryotes.faa
 - usage: bash 05_filter_by_taxa_name_bbmap.sh
 
 ## Step 6: run 06_sanity_check.sh compare the expected number of taxa (queried via wget) with the number of taxa writted to custom KEGG database
-- input file: n/a
-- output file: n/a
+- input: database/B12_reference_db_with_eukaryotes.faa, database/B12_reference_db_no_eukaryotes.faa 
+- output: n/a (check text output)
 - usage: bash 06_sanity_check.sh
 
 ## Step 7: run 07_dedup_bbmap.sh to remove exact sequence duplicates using bbmap's dedup.sh tool
-- input file: B12_reference_db_no_eukaryotes.faa
-- output file: deduped_B12_db_no_eukaryotes.faa
+- input file: database/B12_reference_db_no_eukaryotes.faa
+- output file: database/deduped_B12_db_no_eukaryotes.faa
 - usage: bash 07_dedup_bbmap.sh
 
 ## Step 8: run 08_parse_multifasta_short_header.py to read from and write to multi-fasta headers using Biopython's SeqIO module
-- input: deduped_B12_db_no_eukaryotes.faa
-- output: deduped_B12_db_no_eukaryotes_modified_short_headers.faa
-- usage *in conda env with biopython installed*: python 08_parse_multifasta_short_header.py 
+- input: database/deduped_B12_db_no_eukaryotes.faa
+- output: database/deduped_B12_db_no_eukaryotes_modified_short_headers.faa
+- usage: python 08_parse_multifasta_short_header.py 
 
 ## Step 9: run 09_filter_by_name_short_headers_bbmap.sh to remove viral addendum category peptides from a custom KEGG database
-- input: deduped_B12_db_no_eukaryotes_modified_short_headers.fa
-- output: final_db.faa
+- input: database/deduped_B12_db_no_eukaryotes_modified_short_headers.fa
+- output: database/final_db.faa
 - usage: bash 09_filter_by_name_short_headers_bbmap.sh
 
 ## Step 10: run 10_make_description_lookup_file.py to write a description lookup file for the shortened fasta headers (optional)
-- input: deduped_B12_db_no_eukaryotes.faa
+- input: database/deduped_B12_db_no_eukaryotes.faa
 - output: fasta_header_description_lookup.tsv
-- usage *in conda env with biopython installed*: python 10_make_description_lookup_file.py
+- usage: python 10_make_description_lookup_file.py

@@ -46,4 +46,4 @@ diff -u database_geneIDs.txt sorted_expected_geneIDs.txt >> difference_in_geneID
 cat difference_in_geneIDs.txt | grep "^+" | sed 's/^+//' | awk 'NR>1' | sort | uniq > gene_IDs_to_append.txt
 
 ## remove intermediate files
-rm expected_geneIDs.txt database_geneIDs.txt sorted_expected_geneIDs.txt difference_in_geneIDs.txt
+rm expected_geneIDs.txt database_geneIDs.txt sorted_expected_geneIDs.txt difference_in_geneIDs.txt EC_to_KO.txt KO_to_geneID.txt 

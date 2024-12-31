@@ -37,7 +37,7 @@ appended_geneID=$(cat gene_IDs_to_append.txt | wc -l)
 output_n=$(cat database/B12_reference_db_with_eukaryotes.faa | grep ">" | wc -l)
 
 if [ $((input_n + appended_geneID)) -eq $output_n ]; then
-  echo "Input number ($num1) plus appended number ($num2) is equal to expected output number ($num3)"
+  echo "Input number ($input_n) plus appended number ($appended_geneID) is equal to expected output number ($output_n)"
 else
   echo "Input number plus appended number is not equal to expected output number... please investigate."
 fi

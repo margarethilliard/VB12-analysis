@@ -2,8 +2,10 @@
 Scripts used in the analysis of vitamin B12 data for the USDA Nutritional Phenotyping Study
 
 ### Step 1: Download required software 
+- [wget](https://www.gnu.org/software/wget/)
 - [R 4.2](https://www.r-project.org/) (or newer)
 - [RStudio](https://posit.co/download/rstudio-desktop/) '2024.04.2+764' (or newer)
+- [DIAMOND](https://github.com/bbuchfink/diamond)
 - [Python 3.9.13](https://www.anaconda.com/download)
 - [BBMap](https://sourceforge.net/projects/bbmap/)
 - [TaxaHFE version 2.2](https://github.com/aoliver44/taxaHFE) I'm currently using the development branch...
@@ -24,4 +26,4 @@ Scripts used in the analysis of vitamin B12 data for the USDA Nutritional Phenot
 
 ### A note on computing environments
 - Steps 2-4 were run on Spitfire, a slurm-based HPC cluster managed by the UC Davis Genome Center 
-- Step 5-6 were run locally in R on a MacBook Pro using a Apple M3 Max chip 
+- Step 5 was run locally in R on a MacBook Pro using a Apple M3 Max chip 
