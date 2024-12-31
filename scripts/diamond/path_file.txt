@@ -1,0 +1,3 @@
+subject_1 /share/path/to/merged/reads/subject_1.extendedFrags.fastq /path/to/microbe_census/output/subject_1_mc.txt
+subject_2 /share/path/to/merged/reads/subject_2.extendedFrags.fastq /path/to/microbe_census/output/subject_2_mc.txt
+subject_3 /share/path/to/merged/reads/subject_3.extendedFrags.fastq /path/to/microbe_census/output/subject_3_mc.txt
