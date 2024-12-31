@@ -33,7 +33,7 @@ Scripts used to build the custom prokaryotic vitamin B12 amino acid database
 
 ## Step 7: run 07_dedup_bbmap.sh to remove exact sequence duplicates using bbmap's dedup.sh tool
 - input file: database/B12_reference_db_no_eukaryotes.faa
-- output file: database/deduped_B12_db_no_eukaryotes.faa
+- output file: database/deduped_B12_db_no_eukaryotes.faa 
 - usage: bash 07_dedup_bbmap.sh
 
 ## Step 8: run 08_parse_multifasta_short_header.py to read from and write to multi-fasta headers using Biopython's SeqIO module

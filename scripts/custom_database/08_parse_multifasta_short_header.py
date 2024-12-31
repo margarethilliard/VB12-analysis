@@ -15,23 +15,20 @@
 
 # run once to create initial conda environement:
 # module load anaconda3/4.12.0
-# conda create --name env
+# conda create --name <my-env>
 
 # run everytime you use the script:
 # source ~/.bashrc
-# conda activate env
+# conda activate metagenome
 
 # run once to install biopython:
 # conda install biopython
 
-# navigate to database directory 
-# cd /share/lemaylab-backedup/mhilliard/B12_database/database
-
 import re
 from Bio import SeqIO
 
-input_file = "deduped_B12_db_no_eukaryotes.faa"
-output_file = "deduped_B12_db_no_eukaryotes_modified_short_headers.faa" # desired output file name
+input_file = "database/deduped_B12_db_no_eukaryotes.faa" 
+output_file = "database/deduped_B12_db_no_eukaryotes_modified_short_headers.faa" # desired output file name
 
 with open(output_file, "w") as out_handle: # makes the output file writable
   for record in SeqIO.parse(input_file, "fasta"):
@@ -59,5 +56,13 @@ with open(output_file, "w") as out_handle: # makes the output file writable
         if match:
           id_parts[0] = match.group(0)
           record.id = "-".join(id_parts)
-      record.description = "" # assigning to an empty string to not print in fasta
-      SeqIO.write(record, out_handle, "fasta")
+      # remove fasta entries that don't have 
+      # assigned K numbers or alternative names 
+      
+      #### this section is under construction #### 
+      
+      # pattern = r"^no-.*"  # pattern to match entries starting with "no-"
+      # for record in SeqIO.parse(input_file, "fasta"):
+        # if not re.match(pattern, record.id):  # negated condition filters out matches
+          # record.description = "" # assigning to an empty string to not print in fasta
+        # SeqIO.write(record, out_handle, "fasta")
