@@ -1,5 +1,5 @@
 ## Diet and Microbiome Predictors of Plasma Vitamin B12 in Healthy U.S. Adults
-Scripts used to find amino acids related to vitamin B12 synthesis in fecal metagenome (merged) reads. Metagenomic read pre-processing was done previously using [this code](https://github.com/dglemay/ARG_metagenome). 
+Scripts used to find amino acids related to vitamin B12 synthesis in fecal metagenome (merged) reads. Metagenomic read pre-processing was done previously using code in this repo: https://github.com/dglemay/ARG_metagenome 
 
 ## Step 1: run 01_make_scripts.sh to build DIMAOND DB and make scripts 
 - input: database/final_db.faa, path_file.txt 
