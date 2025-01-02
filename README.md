@@ -15,7 +15,7 @@ Scripts used in the analysis of vitamin B12 data for the USDA Nutritional Phenot
 
 ### Step 2: Create the custom prokaryotic vitamin B12 amino acid database (optional)
 - Scripts to reproduce this step of the workflow are located in "scripts/custom_database/"
-- Alternatively, you can download a copy of the database from this repository (scripts/custom_database/final_db.faa.gz)
+- Alternatively, you can download a copy of the database from this repository (scripts/custom_database/database/final_db.faa.gz)
 
 ### Step 3: use DIAMOND to find your sequences of interest in fecal metagenomes 
 - Scripts to reproduce this step of the workflow are located in "scripts/diamond/"
