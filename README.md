@@ -6,6 +6,7 @@ Scripts used in the analysis of vitamin B12 data for the USDA Nutritional Phenot
 - [DIAMOND](https://github.com/bbuchfink/diamond)
 - [BBMap](https://sourceforge.net/projects/bbmap/)
 - [Python 3.9.13](https://www.anaconda.com/download)
+- [seqkit](https://github.com/shenwei356/seqkit) (optional)
 - [parallel](https://www.gnu.org/software/parallel/man.html) (optional)
 - [R 4.2](https://www.r-project.org/) (or newer)
 - [RStudio](https://posit.co/download/rstudio-desktop/) '2024.04.2+764' (or newer)

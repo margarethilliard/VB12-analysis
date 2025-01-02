@@ -36,17 +36,32 @@ Scripts used to build the custom prokaryotic vitamin B12 amino acid database
 - output file: database/deduped_B12_db_no_eukaryotes.faa 
 - usage: bash 07_dedup_bbmap.sh
 
-## Step 8: run 08_parse_multifasta_short_header.py to read from and write to multi-fasta headers using Biopython's SeqIO module
+## Step 8: run 08_parse_multifasta_short_header.py to shorten multi-fasta headers using Biopython's SeqIO module
 - input: database/deduped_B12_db_no_eukaryotes.faa
-- output: database/deduped_B12_db_no_eukaryotes_modified_short_headers.faa
+- output: database/deduped_B12_db_no_eukaryotes_short_headers.faa
 - usage: python 08_parse_multifasta_short_header.py 
 
-## Step 9: run 09_filter_by_name_short_headers_bbmap.sh to remove viral addendum category peptides from a custom KEGG database
-- input: database/deduped_B12_db_no_eukaryotes_modified_short_headers.fa
+## Step 9: run 09_filter_fasta_header.py 
+- input: database/deduped_B12_db_no_eukaryotes_short_headers.faa
+- output: database/deduped_B12_db_no_eukaryotes_short_headers_filtered.faa
+- usage: python 09_filter_fasta_header.py
+
+## Step 10: run 10_filter_ag_vg_bbmap.sh to remove viral addendum category peptides from a custom KEGG database
+- input: database/deduped_B12_db_no_eukaryotes_short_headers_filtered.faa
 - output: database/final_db.faa
 - usage: bash 09_filter_by_name_short_headers_bbmap.sh
 
-## Step 10: run 10_make_description_lookup_file.py to write a description lookup file for the shortened fasta headers (optional)
+## Step 11: run 11_make_description_lookup_file.py to write a description lookup file for the shortened fasta headers (optional)
 - input: database/deduped_B12_db_no_eukaryotes.faa
 - output: fasta_header_description_lookup.tsv
-- usage: python 10_make_description_lookup_file.py
+- usage: python 11_make_description_lookup_file.py
+
+## Step 12 (optional): run 12_seq_length_distribution.sh to get the sequence length distribution from your custom database file
+- input: database/final_db.faa
+- output: final_db_seq_lengths.txt
+- usage: bash 12_seq_length_distribution.sh
+
+## Step 13 (optional): run 13_query_short_seqs.py to query the shortest sequences in the custom database file 
+- input: 
+- output: 
+- usage:
