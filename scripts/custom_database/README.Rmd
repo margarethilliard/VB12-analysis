@@ -1,5 +1,5 @@
 ## Diet and Microbiome Predictors of Plasma Vitamin B12 in Healthy U.S. Adults
-Scripts used to build the custom prokaryotic vitamin B12 amino acid database 
+Scripts used to build the custom prokaryotic anaerobic vitamin B12 amino acid database 
 
 ## Step 1: run 01_build_custom_db.sh to get amino acid sequences from KEGG API using wget
 - input: B12_genes_with_EC_numbers.txt, B12_genes_with_KEGG_ID.txt, B12_genes_with_K_numbers.txt

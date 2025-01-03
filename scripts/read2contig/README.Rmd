@@ -1,0 +1,46 @@
+## Diet and Microbiome Predictors of Plasma Vitamin B12 in Healthy U.S. Adults
+Scripts used to assign taxonomy to reads that hit custom prokaryotic vitamin B12 amino acid database 
+
+## STEP 1: copy required files to your directory
+cd /share/lemaylab-backedup/mhilliard/FL100/read2contig
+cp /share/lemaylab/aoliver/FL100_metagenomic_analysis/read2contig_paths.sh .
+cp /share/lemaylab/aoliver/FL100_metagenomic_analysis/FL100_metageonome_paths.txt . 
+cp /share/lemaylab/aoliver/stephanie/read2contig/read2contig.sh .
+
+## STEP 2: manually modify diamond and output paths in read2contig_paths.sh: 
+## nano read2contig_paths.sh
+## modify "diamond_file=/share/lemaylab-backedup/sblecksmith/FL100_metagenomes/CAZy_diamond/${sample}.txt" to 
+## "diamond_file=/share/lemaylab/user/path/to/diamond_output/${sample}.txt"
+## do the same for the output path variables
+## use ^x to exit nano
+
+## STEP 3: generate the read2contig_paths.txt file 
+bash read2contig_paths.sh ## make sure you've modified file paths read2contig_paths.sh first!!
+
+## STEP 4: generate tmp directories -- helpful to use a screen if possible 
+## practice command 
+bash read2contig.sh -d /share/lemaylab-backedup/mhilliard/FL100/diamond/diamond_output/7090.txt -r /share/lemaylab/jalarke/FL100_metagenomes/NovaSeq792/step4_flash/7090.extendedFrags.fastq -c /share/lemaylab-backedup/FL100_step8_assemblies/NovaSeq792/7090_assembled/final.contigs.fa.gz -o /share/lemaylab-backedup/mhilliard/FL100/read2contig -t 8 -f none
+## in parallel 
+screen -S read2contig_screen
+cd /share/lemaylab-backedup/mhilliard/FL100/read2contig
+parallel --colsep ' ' -a /share/lemaylab-backedup/mhilliard/FL100/read2contig/read2contig_paths.txt -j 8 bash read2contig.sh -d {1} -c {2} -r {3} -o {4} -t {5} -f none
+## control+a+d to exit screen
+
+## STEP 5: copy your diamond output files and blast output files to new directories 
+mkdir diamond_files blastouts
+cp /share/lemaylab-backedup/mhilliard/FL100/diamond/diamond_output/*.txt /share/lemaylab-backedup/mhilliard/FL100/read2contig/diamond_files/
+cd /share/lemaylab-backedup/mhilliard/FL100/read2contig
+cp tmp_*/*.blastouts blastouts/
+
+## STEP 6: copy over taxonomy_files directory and gen_read_taxonomy_file.R script 
+cd /share/lemaylab-backedup/mhilliard/FL100/read2contig
+cp -r /share/lemaylab/aoliver/sarah_gh/playground/read2contig/taxonomy_files .
+cp /share/lemaylab/aoliver/sarah_gh/playground/read2contig/gen_read_taxonomy_file.R .
+
+## STEP 7: load up singularity -- helpful to use a screen if possible 
+screen -r read2contig_screen
+module load /software/modules/1.923/lssc0-linux/modulefiles/singularity/3.6.3
+singularity run -W /share/lemaylab/mhilliard/FL100/read2contig --bind /share/lemaylab/mhilliard/FL100/read2contig:/home/docker /share/lemaylab/aoliver/software/nutrition_tools.sif
+
+## STEP 8: source the script 
+source("/home/docker/gen_read_taxonomy_file.R")
