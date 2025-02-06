@@ -16,7 +16,7 @@ Scripts used in the analysis of vitamin B12 data for the USDA Nutritional Phenot
 ### Step 2: Clean the data, check assumptions, transform variables, explore trends, make comparisons, etc.
 - Scripts to reproduce this step are located in "scripts/basic_data_exploration/"
 
-## Step 3: Look for dietary and microbial predictors of vitamin B12 using taxaHFE/dietML
+### Step 3: Look for dietary and microbial predictors of vitamin B12 using taxaHFE/dietML
 - Scripts to reproduce this step are located in "scripts/machine_learning"
 
 ### Step 4: Create the custom prokaryotic vitamin B12 amino acid database (optional)
