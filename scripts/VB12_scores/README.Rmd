@@ -1,0 +1,15 @@
+## Diet and Microbiome Predictors of Plasma Vitamin B12 in Healthy U.S. Adults
+Scripts used to score vitamin B12 synthesis potential from enzymes in fecal metagenomes 
+
+## STEP 1: copy the results from read2contig to your working directory 
+
+input: full_taxonomic_results.rds
+output 
+
+## STEP 2: compute scores 
+input: 
+output: 
+
+## STEP 3: identify what taxa aren't matching as expected using get_contigs.R
+
+
