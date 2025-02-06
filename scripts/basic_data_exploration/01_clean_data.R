@@ -1972,6 +1972,6 @@ levels(data$ffq_qaqc_foodsperday.factor)=c("Adequate number of foods per day rep
 levels(data$ffq_qc_passed.factor)=c("Yes","No")
 levels(data$block_ffq_complete.factor)=c("Incomplete","Unverified","Complete")
 
-write.csv(data, "/Users/local-margaret/Desktop/R-projects/FL100/data/cleaned-data/clean_FL100_FFQ.csv")
+# write.csv(data, "data/cleaned-data/clean_FL100_FFQ.csv")
 
 View(data)

@@ -1,5 +1,5 @@
 ## Diet and Microbiome Predictors of Plasma Vitamin B12 in Healthy U.S. Adults
-Scripts used in the analysis of vitamin B12 data for the USDA Nutritional Phenotyping Study
+Scripts used in the analysis of vitamin B12 and microbiome data for the USDA Nutritional Phenotyping Study
 
 ### Step 1: Download required software
 - [R 4.2](https://www.r-project.org/) (or newer)
@@ -13,7 +13,7 @@ Scripts used in the analysis of vitamin B12 data for the USDA Nutritional Phenot
 - [seqkit](https://github.com/shenwei356/seqkit) (optional)
 - [parallel](https://www.gnu.org/software/parallel/man.html) (optional)
 
-### Step 2: Clean the data, check assumptions, transform variables, explore trends, make comparisons, etc.
+### Step 2: Data wrangling, basic visualizations, etc.
 - Scripts to reproduce this step are located in "scripts/basic_data_exploration/"
 
 ### Step 3: Look for dietary and microbial predictors of vitamin B12 using taxaHFE/dietML

@@ -1,11 +1,11 @@
 ## Diet and Microbiome Predictors of Plasma Vitamin B12 in Healthy U.S. Adults
 Scripts used in data wrangling and basic visualizations of vitamin B12 status, dietary, and metagenomic data 
 
-## Step 1: clean rawFFQ data 
+## Step 1: clean raw FFQ data 
 - input: CTSC24532USDAWHNRCNu_DATA_2021-06-07_1529.csv
 - output: clean_FL100_FFQ.csv
 
-## Step 2: check assumption and transform response variable 
+## Step 2: merge data, check assumption and transform response variable 
 - inputs: 1) clean_FL100_FFQ.csv 2) diet_data_AtLeast2atHomeRecallsQC.txt 3) 2024-08-16-FL100 B12 and folate results and Stnds and Utak.xlsx
 - output: B12_with_BMI.csv
 
