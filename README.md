@@ -30,6 +30,7 @@ Scripts used in the analysis of vitamin B12 and microbiome data for the USDA Nut
 - Scripts to reproduce this step are located in [scripts/read2contig/](https://github.com/margarethilliard/VB12-analysis/tree/main/scripts/read2contig)
 
 ### Step 7: Compute B12 sythesis and utilization scores in R 
+- This step is under construction - more to come. 
 - Scripts to reproduce this step are located in [scripts/VB12_scores/](https://github.com/margarethilliard/VB12-analysis/tree/main/scripts/VB12_scores)
 
 ### A note on computing environments 

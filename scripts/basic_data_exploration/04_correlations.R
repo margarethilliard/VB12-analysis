@@ -27,7 +27,45 @@ abundance <- read_tsv("/Users/local-margaret/Desktop/R-projects/FL100/data/merge
   select(-strain) %>%
   as_tibble()
 
-##### supplement non-user correlations ##### 
+
+##### correlations that don't take taxa into account #####
+
+## all participants 
+metadata %>%
+  select(age, sex, bmi, recent_dietary_b12_avg, habitual_dietary_b12, daily_supplemented_b12, plasma_b12, eGFR, dt_b12ad, dt_vb12) %>%
+  corrr::correlate(method = "kendall") %>% corrr::autoplot() +
+  scale_y_discrete(labels=c("BMI", 
+                            expression(Plasma~B[12]), 
+                            expression(B[12]~from~fortificants),
+                            expression(Naturally~occuring~B[12]), 
+                            expression(Habitual~dietary~B[12]~(sum)),
+                            expression(Supplemented~B[12]), 
+                            expression(Recent~B[12]~intake~(average)),
+                            "Age")) +
+  scale_x_discrete(labels=c(expression(Recent~B[12]~intake~(average)),
+                                       expression(Supplemented~B[12]),
+                                       expression(Habitual~dietary~B[12]~(sum)), 
+                                       expression(Naturally~occuring~B[12]), 
+                                       expression(B[12]~from~fortificants),
+                                       expression(Plasma~B[12]), 
+                                       "BMI",
+                                       "eGFR"), position = "top")
+
+# ggsave("/Users/local-margaret/Desktop/R-projects/FL100/figures/correlations-without-taxa.pdf", height = 5, width = 8)
+
+## no supplements 
+metadata %>%
+  filter(supplement_taker == "no") %>%
+  select(age, sex, bmi, recent_dietary_b12_avg, habitual_dietary_b12, plasma_b12, eGFR, dt_b12ad, dt_vb12) %>%
+  corrr::correlate(method = "kendall") %>% corrr::autoplot() 
+
+## yes supplements 
+metadata %>%
+  filter(supplement_taker == "yes") %>%
+  select(age, sex, bmi, recent_dietary_b12_avg, habitual_dietary_b12, daily_supplemented_b12, plasma_b12, eGFR, dt_b12ad, dt_vb12) %>%
+  corrr::correlate(method = "kendall") %>% corrr::autoplot()
+
+##### supplement non-user correlations with taxaHFE-identified taxa ##### 
 
 # only retain taxa that taxaHFE identified as important 
 selected_abundance <- merge(metadata, abundance, all.x = T, by = "subject_id") %>%
@@ -186,3 +224,26 @@ plot_A / plot_B +
   plot_annotation(tag_levels = 'A')
 
 # ggsave("figures/combinded_correlation_figure.pdf", height = 10, width = 8)
+
+View(correlations_df)
+
+# alternative method for correlation plots
+
+test <- merge(metadata, abundance, all.x = T, by = "subject_id") %>%
+  filter(species %like% "s__Alistipes_finegoldii" |
+           genus %like% "g__Intestinimonas" |
+           species %like% "s__Roseburia_sp_AM16_25" |
+           species %like% "s__Clostridiaceae_bacterium" |
+           species %like% "s__Blautia_massiliensis" | 
+           species %like% "s__Streptococcus_SGB14888" |
+           genus %like% "g__GGB9062" |
+           genus %like% "g__GGB3005" |
+           species %like% "s__Bacteroides_finegoldii" |
+           class %like% "c__CFGB1507") %>%
+  filter(supplement_taker == "no") %>%
+  select(subject_id, age, bmi, recent_dietary_b12_avg, habitual_dietary_b12, plasma_b12, daily_supplemented_b12, eGFR, dt_b12ad, dt_vb12, kingdom:species, relative_abundance) %>%
+  filter(genus != "g__NA") %>%
+  unique() %>%
+  filter(relative_abundance > 0)
+
+
