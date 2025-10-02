@@ -16,7 +16,7 @@ setwd("/Users/local-margaret/Desktop/VB12_analysis/")
 
 # ---- Figure 5: predicting plasma B12 concentration from all participants ---- 
 new_env <- new.env()
-load(file = "RF_analysis/SHAP_rds_files/regression_plasmaB12~diet+microbiome_FULL_DATA.rds", envir = new_env)
+load(file = "RF_analysis/rds_files/regression_plasmaB12~diet+microbiome_FULL_DATA.rds", envir = new_env)
 
 p <- shapviz::sv_importance(new_env$sv_full, kind = "bee", show_numbers = TRUE, bee_width = 0.2, max_display = 10)
 
@@ -116,7 +116,7 @@ dependence_plot_main
 
 # ---- Figure 6A-B: predicting plasma B12 concentration in low intake group ---- 
 new_env <- new.env()
-load(file = "RF_analysis/SHAP_rds_files/regression_plasmaB12~diet+microbiome+LOW_INTAKE.rds", envir = new_env)
+load(file = "RF_analysis/rds_files/regression_plasmaB12~diet+microbiome+LOW_INTAKE.rds", envir = new_env)
 
 p <- shapviz::sv_importance(new_env$sv_full, kind = "bee", show_numbers = TRUE, bee_width = 0.2, max_display = 5)
 
@@ -192,7 +192,7 @@ plot_B
 
 # ---- Figure 6C-D: predicting plasma B12 concentration in supp non users ---- 
 new_env <- new.env()
-load(file = "RF_analysis/SHAP_rds_files/regression_plasmaB12~diet+microbiome+SUPP_NON_USERS.rds", envir = new_env)
+load(file = "RF_analysis/rds_files/regression_plasmaB12~diet+microbiome+SUPP_NON_USERS.rds", envir = new_env)
 
 p <- shapviz::sv_importance(new_env$sv_full, kind = "bee", show_numbers = TRUE, bee_width = 0.2, max_display = 5)
 
