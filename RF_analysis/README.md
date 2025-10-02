@@ -15,7 +15,7 @@
     
 - If you're doing a subset analysis, subset your metadata using "subset_taxaHFE_dataset.R" script, or similar method to include only participants with your feature of interest (e.g., supplement users). 
 
-### STEP 1: Generate a random seed file & a text file with the list of commands (this is your input to parallel on HIVE)
+### Step 1: Generate a random seed file & a text file with the list of commands (this is your input to parallel on HIVE)
 
     mkdir /quobyte/dglemaygrp/mhilliard/FL100/dietML/full_data && cd /quobyte/dglemaygrp/mhilliard/FL100/dietML/full_data
     
@@ -24,15 +24,15 @@
     # change the parameters & paths in this file before running 
     bash generate_100_commands.sh
 
-### STEP 2: Run dietML
+### Step 2: Run dietML
 
     module load apptainer/latest 
     module load parallel/20220522
     
     parallel -j 5 -a 100_commands.txt
 
-### STEP 3: Optional, use the watch script to keep track of the best performing models (I use a separate terminal tab)
+### Step 3: Optional, use the watch script to keep track of the best performing models (I use a separate terminal tab)
 
     watch -d bash watch_script.sh 
 
-### STEP 4: Quantify model accuracy/performace relative to the null model using the "mean_percent_change_accuracy_plot.R" script 
+### Step 4: Quantify model accuracy/performace relative to the null model using the "mean_percent_change_accuracy_plot.R" script 
