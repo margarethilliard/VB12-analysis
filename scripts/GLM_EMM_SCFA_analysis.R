@@ -3,6 +3,7 @@
 
 #install.packages(c("dplyr", "purrr", "tidyr", "tibble", "DHARMa", "emmeans", "ggpubr", "stringr", "ggplot2", "ggsignif", "patchwork", "performance"))
 
+# Load libraries
 library(dplyr)
 library(purrr)
 library(tidyr)
@@ -14,8 +15,9 @@ library(stringr)
 library(ggplot2)
 library(ggsignif)
 library(patchwork)
-library(performance) # pseudo-R2
+library(performance) 
 
+# Set working directory and source the data 
 setwd("/Users/local-margaret/Desktop/VB12-analysis")
 source("scripts/get_data.R")
 
