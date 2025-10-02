@@ -22,7 +22,7 @@
 
 - Key output file is "hyper_param_search_commands.txt"
 
-### Step 2: Run TaxaHFE-ML to select the most explanatory microbial features for your response of interest 
+### Step 2: Run TaxaHFE-ML 
 
         module load apptainer/latest 
         module load parallel/20220522
