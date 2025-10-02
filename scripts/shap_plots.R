@@ -11,6 +11,7 @@ library(tidyr)
 library(patchwork)
 library(cowplot)
 
+# Set working directory 
 setwd("/Users/local-margaret/Desktop/VB12_analysis/")
 
 # ---- Figure 5: predicting plasma B12 concentration from all participants ---- 
