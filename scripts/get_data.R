@@ -3,6 +3,7 @@
 
 #install.packages(c("readr", "readxl", "janitor", "dplyr", "tidyr", "tibble", "bestNormalize"))
 
+# Load libraries 
 library(readr)
 library(readxl)
 library(janitor)
