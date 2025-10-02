@@ -33,5 +33,5 @@ ____________
 _______________
 
 - R analyses and visualizations were run locally on a MacBook Pro (Apple M3 Max chip).
-- Machine learning analyses were run on HIVE, a slurm-based HPC cluster managed by the High Performance Computing Core Facility at the University of California Davis.
+- Machine learning analyses and MAG reconstruction were run on HIVE, a slurm-based HPC cluster managed by the High Performance Computing Core Facility at the University of California Davis.
 - Metagenomic sequence pre-processing steps were run previously on Spitfire, a slurm-based HPC cluster managed by the University of California Davis Genome Center. Code for metagenomic sequencing pre-processing can be found [here](https://github.com/dglemay/ARG_metagenome).
