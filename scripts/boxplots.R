@@ -3,6 +3,7 @@
 
 #install.packages(c("dplyr", "ggplot2", "rstatix", "ggpubr", "ggbreak", "patchwork", "scales"))
 
+# Load libraries 
 library(dplyr)
 library(ggplot2)
 library(rstatix)
@@ -11,6 +12,7 @@ library(ggbreak)
 library(patchwork)
 library(scales)
 
+# Set working directory and source data 
 setwd("/Users/local-margaret/Desktop/VB12-analysis")
 source("scripts/get_data.R")
 
