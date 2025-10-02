@@ -12,7 +12,7 @@ library(ggbreak)
 library(patchwork)
 library(scales)
 
-# Set working directory and source data 
+# Set working directory and source the data 
 setwd("/Users/local-margaret/Desktop/VB12-analysis")
 source("scripts/get_data.R")
 
