@@ -3,7 +3,7 @@
 
 #install.packages(c("dplyr", "readr", "ggplot2", "bestNormalize", "car", "rstatix", "ggpubr", "wesanderson", "gtsummary", "kableExtra", "png", "patchwork", "cowplot", "ggcorrplot"))
 
-# load libraries 
+# Load libraries 
 library(dplyr)
 library(readr)
 library(ggplot2)
@@ -19,7 +19,7 @@ library(patchwork)
 library(cowplot)
 library(ggcorrplot)
 
-# set working directory and source the data
+# Set working directory and source the data
 setwd("/Users/local-margaret/Desktop/VB12-analysis")
 source("scripts/get_data.R")
 
