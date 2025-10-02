@@ -12,6 +12,7 @@ library(stringr)
 library(ggplot2)
 library(patchwork)
 
+# Set working directory and source the data
 setwd("/Users/local-margaret/Desktop/VB12-analysis")
 source("scripts/get_data.R")
 
