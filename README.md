@@ -7,7 +7,7 @@ This repository contains scripts for analyses presented in the following study (
 -   **Hilliard, M.A**, Oliver, A., Wilson, S.M.G., Shahab-Ferdows, S., Hampel, D., Stephensen C.B., Bennett, B.J.,  Allen, L.A., Lemay D.G. (2025). Diet and Microbiome Predictors of Plasma Vitamin B12 status in Healthy US Adults. 
 
 ______________
-### **Data Availibility**
+### **Data availibility**
 ___________________
 
 - Metagenomes are deposited in NCBI Sequence Read Archive (SRA) under the [study accession SRP354271](https://dataview.ncbi.nlm.nih.gov/object/PRJNA795985) and [BioProject PRJNA1090850](https://www.ncbi.nlm.nih.gov/bioproject/?term=PRJNA1090850). 
