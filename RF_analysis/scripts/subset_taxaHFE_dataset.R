@@ -3,10 +3,12 @@
 
 #install.packages(c("dplyr", "tidyverse", "readr"))
 
+# Load libraries 
 library(dplyr)
 library(tidyverse)
 library(readr)
 
+# Set working directory and source the data
 setwd("/Users/local-margaret/Desktop/VB12-analysis")
 source("scripts/get_data.R")
 
