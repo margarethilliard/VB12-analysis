@@ -33,6 +33,6 @@
 
 ### Step 3: Optional, use the watch script to keep track of the best performing models (I use a separate terminal tab)
 
-    watch -d bash watch_script.sh # to exit watch use: control+c 
+    watch -d bash dietML_watch_script.sh # to exit watch use: control+c 
 
 ### Step 4: Quantify model accuracy/performace relative to the null model using the "mean_percent_change_accuracy_plot.R" script 
