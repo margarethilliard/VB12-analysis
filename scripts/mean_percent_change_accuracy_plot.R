@@ -3,7 +3,7 @@
 
 #install.packages(c("dplyr", "plotrix", "ggplot2", "FSA", "multcompView", "ggtext", "janitor", "forcats"))
 
-## Load libraries 
+# Load libraries 
 library(dplyr)
 library(plotrix) # for std err calc
 library(ggplot2)
@@ -13,6 +13,7 @@ library(ggtext)
 library(janitor)
 library(forcats)
 
+# Set working directory
 setwd("/Users/local-margaret/Desktop/VB12-analysis/")
 
 # ---- Read in model performance data ---- 
