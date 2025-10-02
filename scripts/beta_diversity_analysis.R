@@ -2,12 +2,14 @@
 
 #install.packages(c("dplyr", "vegan", "bestNormalize", "ape", "ggplot2))
 
+# Load libraries
 library(dplyr)
 library(vegan)
 library(bestNormalize)
 library(ape)
 library(ggplot2)
 
+# Set working directory and source the data 
 setwd("/Users/local-margaret/Desktop/VB12-analysis")
 source("scripts/get_data.R")
 
