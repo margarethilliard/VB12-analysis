@@ -13,7 +13,7 @@
         subject_003,27,Female,27.028095733610822,115.9365355,267,1.4061000000000001
 
     
-- If you're doing a subset analysis, subset your metadata using "subset_taxaHFE_dataset.R" script, or similar method to include only participants with your feature of interest (e.g., supplement users). 
+- If you're doing a subset analysis, subset your metadata by using the "subset_taxaHFE_dataset.R" script, or similar method to include only participants with your feature of interest (e.g., supplement users). 
 
 ### Step 1: Generate a random seed file & a text file with the list of commands (this is your input to parallel on HIVE)
 
