@@ -2,7 +2,7 @@ ______________
 ### **Summary**
 ___________________
 
-This repository contains scripts for analyses presented in the following study (submitted for publication):
+This repository contains scripts for analyses presented in the following study (submission pending):
 
 -   **Hilliard, M.A**, Oliver, A., Wilson, S.M.G., Shahab-Ferdows, S., Hampel, D., Stephensen C.B., Bennett, B.J.,  Allen, L.A., Lemay D.G. (2025). Diet and Microbiome Predictors of Plasma Vitamin B12 status in Healthy US Adults. 
 
