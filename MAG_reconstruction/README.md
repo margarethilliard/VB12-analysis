@@ -2,7 +2,7 @@
 ## Purpose: to map contigs (ouput from MEGAHIT-1.2.9) using Bowtie2 for single-sample binning of FL100 metagenomes on HIVE using Metabat2
 - I've also done some MAG/bin QC at the end using CheckM2, then an annotation step so the MAGs can be used with the anvio's suite of programs
 - See here for pre-processing steps: https://github.com/dglemay/ARG_metagenome/blob/master/master_pipeline/ARG_pipeline_v0.3.sh
-- A note on resource usage: My lab mates were really chill with me using 80 of our dedicated cores for ~1-2 weeks while I assembled ~330 MAGs. You can (and should) use more or less resources based on what's available to you! 
+- A note on resource usage: My lab mates were really chill with me using 80 of our dedicated cores for ~1-2 weeks while I assembled MAGs from 300+ human fecal samples. You can (and should) use more or less resources based on what's available to you! 
 
 ## Here are  anvi'o tutorials I used to get started: 
 - https://merenlab.org/tutorials/assembly-based-metagenomics/
