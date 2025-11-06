@@ -13,3 +13,4 @@
 ## Notes
 - Most scripts source the merged and cleaned dataframes using "get_data.R" which is a great way to save time, be consistent, and make the analysis slightly more portable. Highly recommend. 
 - R analyses and visualizations were run locally on a MacBook Pro (Apple M3 Max chip).
+- CONSORT diagram was made manually in PowerPoint. 
