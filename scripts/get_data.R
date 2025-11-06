@@ -67,11 +67,10 @@ print(habitual_b12_norm)
 metadata$habitual_b12_norm <- habitual_b12_norm$x.t
 
 # ---- Microbiome composition ----
-# Use the GTDB taxonomy table 
+# All analyses use the GTDB taxonomy table 
 # Raw copy 
 taxonomy_table <- readr::read_table("/Users/local-margaret/Desktop/VB12-analysis/data/modified_merged_metaphlan_v4-0-6_GTDB.txt")
 
-# Do the same thing for the GTDB taxonomy table 
 gtdb_taxonomy <- readr::read_table("/Users/local-margaret/Desktop/VB12-analysis/data/modified_merged_metaphlan_v4-0-6_GTDB.txt")
 gtdb_taxonomy <- as.data.frame(gtdb_taxonomy)
 rownames(gtdb_taxonomy) <- gtdb_taxonomy$clade_name
