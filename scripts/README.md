@@ -12,8 +12,8 @@
 - Supplemental Figure 4: Venn_diagram.R
 - Supplemental Figure 5: differential_abundance_analysis_V2.R
 - Supplemental Figure 6-7: Main-Text-SHAP-Plots.R
-- Supplemental Figure 8: mean-percent-change-accuracy-intake-subset-analysis-taxa.R
-- Supplemental Figure 9: mean-percent-change-accuracy-intake-subset-analysis-taxa.R, mean-percent-change-accuracy-intake-subset-analysis-pathways.R 
+- Supplemental Figure 8: Model_accuracy_intake_subset_analysis
+- Supplemental Figure 9: Model_accuracy_intake_subset_analysis
 
 ## Notes
 - Most scripts source the merged and cleaned dataframes using "get_data.R" which is a great way to save time, be consistent, and make the analysis slightly more portable. Highly recommend.
