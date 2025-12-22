@@ -7,6 +7,7 @@
 - Figure 6: Main-Text-SHAP-Plots.R
 - Figure 7: Figure_7.R
 - Supplemental Table 1: participant_characteristics.R
+- Supplemental Table 2: alpha_diversity_analysis.R & beta_diversity_analysis.R
 - Supplemental Figure 2-3: partial_and_kendall_correlations.R
 - Supplemental Figure 4: Venn_diagram.R
 - Supplemental Figure 5: differential_abundance_analysis_V2.R
