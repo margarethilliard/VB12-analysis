@@ -60,7 +60,8 @@ panel_a <- ggplot(data, aes(x=supplement_taker, y=plasma_b12, colour = supplemen
   theme(panel.border = element_rect(colour = "black", fill=NA),
         legend.position = "none",
         axis.text = element_text(colour = "black")) +
-  labs(x = "Supplement use", y = expression(Plasma~vitamin~B[12]~", pmol/L"))
+  labs(x = expression(B[12] ~ "supplement use"),
+       y = expression(Plasma~vitamin~B[12]~", pmol/L"))
 
 panel_a
 
@@ -89,7 +90,7 @@ panel_b <- ggplot(data, aes(x=supplement_taker, y=habitual_dietary_b12, colour =
         axis.text.y.right = element_blank(),
         axis.ticks.y = element_blank(),
         axis.text = element_text(colour = "black")) + 
-  labs(x = "Supplement use", 
+  labs(x = expression(B[12] ~ "supplement use"),
        y = expression(Habitual~vitamin~B[12]~" intake, " ~mu~g/d)) +
   ggbreak::scale_y_break(
     breaks = c(100, 145, 500, 735),  # Define where breaks happen
@@ -182,7 +183,7 @@ AAABBCC
 AAADDEE"
 
 # Note: plot4 object is generated from another script called "partial_and_kendall_correlations.R"
-((panel_a + panel_b) / (panel_c + panel_d) | (plot4) ) + 
+((panel_c + panel_d) / (panel_a + panel_b) | (plot4) ) + 
   patchwork::plot_annotation(tag_levels = 'A')
 
 #ggsave("figures/boxplots.pdf", height = 10, width =18)
