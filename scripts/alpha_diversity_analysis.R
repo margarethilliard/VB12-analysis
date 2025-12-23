@@ -51,7 +51,7 @@ for (metric in names(div_list)) {
 }
 
 # merge with metadata
-alpha_diversity <- merge(alpha_diversity, metadata, by = "subject_id")
+alpha_diversity <- merge(alpha_diversity, metadata_sub, by = "subject_id")
 
 # compute evenness 
 alpha_diversity <- alpha_diversity %>%
@@ -110,10 +110,11 @@ print(stats_df)
 
 # --- Test for relationships between alpha diversity and habitual intake as a continuous predictor ----
 
-# normalize predictor variable first 
-habitual_b12_norm <- bestNormalize::bestNormalize(alpha_diversity$habitual_dietary_b12)
-alpha_diversity$habitual_b12_norm <- habitual_b12_norm$x.t
+# normalize predictor variable first, if not done already 
+#habitual_b12_norm <- bestNormalize::bestNormalize(alpha_diversity$habitual_dietary_b12)
+#alpha_diversity$habitual_b12_norm <- habitual_b12_norm$x.t
 
+# linear models using normalized (continuous) habitual dietary B12 to predict diversity 
 lm_stats <- lapply(alpha_metrics, function(metric) {
   model <- lm(reformulate("habitual_b12_norm", metric), data = alpha_diversity)
   tidy_model <- broom::tidy(model)

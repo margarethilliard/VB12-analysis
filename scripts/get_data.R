@@ -97,4 +97,3 @@ gtdb_taxonomy_subset <- inner_join(metadata_sub, gtdb_taxonomy_sub, by = "subjec
 # from Andrew Oliver on 10 July 2025
 scfa <- read.csv("/Users/local-margaret/Desktop/VB12-analysis/data/fecal_scfas.csv", header = T)
 scfa$subject_id <- as.character(scfa$subject_id)
-

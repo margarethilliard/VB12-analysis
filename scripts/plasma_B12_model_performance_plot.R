@@ -117,22 +117,9 @@ letters <- multcompLetters(pvals, threshold = 0.05)
 # Restore original model names in letters
 letters_df <- data.frame(
   model = names(letters$Letters),
-  letter = letters$Letters
-)
+  letter = letters$Letters)
 
 letters_df
-
-# For stars that indicate significance use this:
-#dunn_df <- as.data.frame(dunn_res$res)
-#sig_comparisons <- dunn_df %>%
-#  filter(P.adj < 0.05) %>%
-#  mutate(group1 = sapply(strsplit(Comparison, " - "), `[`, 1),
-#         group2 = sapply(strsplit(Comparison, " - "), `[`, 2),
-#         label = case_when(
-#           P.adj < 0.001 ~ "***",
-#           P.adj < 0.01 ~ "**",
-#           P.adj < 0.05 ~ "*"
-#         ))
 
 ## Calculate mean percent change for MAE (regression models)
 combined_results_mae <- combined_results %>% 
@@ -167,7 +154,7 @@ combined_results_mae$model <- factor(
              "taxaHFE_ML_supplement_users",
              "taxaHFE_ML_no_supplement_use"))
 
-## Plot percent change in MAE compared to null model 
+# ---- Plot percent change in MAE compared to null model ----
 ggplot(combined_results_mae, aes(x = forcats::fct_rev(factor(model)), y = mean_percent_change)) +
   geom_bar(aes(fill = model), stat = "identity", width = 0.75) +
   geom_errorbar(aes(ymin = mean_percent_change - se_percent_change,

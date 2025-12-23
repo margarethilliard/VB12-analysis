@@ -26,11 +26,6 @@ metaphlan_df <- as.data.frame(metaphlan_sub)
 # convert values to numeric
 metaphlan_df[] <- lapply(metaphlan_df, as.numeric)
 
-# reading in alpha diversity table that has useful metadata 
-##alpha_diversity <- readr::read_delim("data/alpha_diversity.csv") %>%
-  #select(-c("...1"))
-
-
 # ---- Beta diversity analysis ---- 
 
 beta_metrics <- c("bray", "jaccard")
@@ -42,6 +37,7 @@ beta_results <- data.frame()
 beta_dists <- lapply(beta_metrics, function(method) {
   vegan::vegdist(metaphlan_df, method = method)
 })
+
 names(beta_dists) <- beta_metrics
 
 for (metric in beta_metrics) {
@@ -66,10 +62,11 @@ for (metric in beta_metrics) {
     ))
   }
 }
-print(beta_results)
 
 # multiple comparison corrections 
 beta_results$FDR_p_value <- p.adjust(beta_results$p_value, method = "fdr")
+
+print(beta_results)
 
 # write table 
 #write.csv(beta_results, "beta_summary_stats.csv", row.names = FALSE)
@@ -127,11 +124,9 @@ ggplot(nmds_df, aes(NMDS1, NMDS2, color = habitual_b12_norm)) +
   facet_wrap(~ Metric, scales = "free") +
   scale_color_viridis_c(option = "plasma") +
   theme_minimal(base_size = 14) +
-  labs(
-    x = "NMDS Axis 1", y = "NMDS Axis 2",
+  labs(x = "NMDS Axis 1", y = "NMDS Axis 2",
     color = expression(Normalized~Habitual~B[12]),
-    title = "NMDS of Beta Diversity by Habitual B12 Intake"
-  )
+    title = "NMDS of Beta Diversity by Habitual B12 Intake")
 
 # stress scores 
 nmds_stress <- sapply(nmds_results, function(x) x$stress)
@@ -162,10 +157,9 @@ for (metric in beta_metrics) {
     dispersion_results_table <- rbind(dispersion_results_table, data.frame(
       Metric = metric,
       Variable = var,
-      p_value = signif(anova_result$`Pr(>F)`[1], digits = 3)
-    ))
+      p_value = signif(anova_result$`Pr(>F)`[1], digits = 3)))
   }
 }
 
-# both distance matrices are not significantly different in terms of their dispersion based on supplement use, B12 tertile, or B12 intake relative to the mean
+# both distance matrices are not significantly different in terms of their dispersion based on supplement use, B12 tertile, or B12 intake relative to the median
 print(dispersion_results_table)

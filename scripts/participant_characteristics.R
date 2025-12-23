@@ -1,18 +1,19 @@
 
-## load libraries
+# Credit to Sarah Blecksmith for the code, sourced from here: https://github.com/sblecksmith/CAZyme_project/blob/master/scripts/supplemental_figures.R
+
+# load libraries
 library(dplyr)
 library(gt)
 
-## source the data 
+# source the data 
 setwd("/Users/local-margaret/Desktop/VB12-analysis/")
 source("scripts/get_data.R")
 
-# code is largely from Sarah Blecksmith's github: https://github.com/sblecksmith/CAZyme_project/blob/master/scripts/supplemental_figures.R
 merged <- metadata_sub
 
-#number of men and women
-men = sum(merged$sex == "Male") #men = 143
-women = sum(merged$sex == "Female") #women = 144
+# number of men and women
+men = sum(merged$sex == "Male") # men = 143
+women = sum(merged$sex == "Female") # women = 144
 
 # age groups women
 women_age1 = sum(merged$sex == "Female" & merged$age >= 18 & merged$age <= 33) # 53
@@ -24,8 +25,7 @@ men_age1 = sum(merged$sex == "Male" & merged$age >= 18 & merged$age <= 33) # 43
 men_age2 = sum(merged$sex == "Male" & merged$age >= 34 & merged$age <= 49) # 53
 men_age3 = sum(merged$sex == "Male" & merged$age >= 50 & merged$age <= 65) # 47
 
-
-#bmi groups women
+# bmi groups women
 women_age1_bmi1 = sum(merged$sex == "Female" & merged$age >= 18 & merged$age <= 33 & merged$bmi < 25) # 17
 women_age1_bmi2 = sum(merged$sex == "Female" & merged$age >= 18 & merged$age <= 33 & merged$bmi >= 25 & merged$bmi <= 29.9) # 19
 women_age1_bmi3 = sum(merged$sex == "Female" & merged$age >= 18 & merged$age <= 33 & merged$bmi > 30) # 16
@@ -38,7 +38,7 @@ women_age3_bmi1 = sum(merged$sex == "Female" & merged$age >= 50 & merged$age <= 
 women_age3_bmi2 = sum(merged$sex == "Female" & merged$age >= 50 & merged$age <= 65 & merged$bmi >= 25 & merged$bmi <= 29.9) # 22
 women_age3_bmi3 = sum(merged$sex == "Female" & merged$age >= 50 & merged$age <= 65 & merged$bmi > 30) # 8
 
-#bmi groups men
+# bmi groups men
 men_age1_bmi1 = sum(merged$sex == "Male" & merged$age >= 18 & merged$age <= 33 & merged$bmi < 25) # 19
 men_age1_bmi2 = sum(merged$sex == "Male" & merged$age >= 18 & merged$age <= 33 & merged$bmi >= 25 & merged$bmi <= 29.9) # 17
 men_age1_bmi3 = sum(merged$sex == "Male" & merged$age >= 18 & merged$age <= 33 & merged$bmi > 30) # 7

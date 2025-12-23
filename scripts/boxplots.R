@@ -1,5 +1,6 @@
 
 # ---- Setup ----
+set.seed(8675309)
 
 #install.packages(c("dplyr", "ggplot2", "rstatix", "ggpubr", "ggbreak", "patchwork", "scales"))
 
@@ -54,11 +55,9 @@ panel_a <- ggplot(data, aes(x=supplement_taker, y=plasma_b12, colour = supplemen
   geom_hline(aes(yintercept = 148), colour="black", linetype="dashed") + # replete range 
   geom_hline(aes(yintercept = 300), colour="black", linetype="dashed") + 
   ggpubr::stat_pvalue_manual(stat.test, label = "p.signif", y.position = 1400, position = position_identity(),
-                     #label = "Wilcoxon, p = {p}", 
                      tip.length = 0.005) + # shortens length of bracket
   scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
   theme(panel.border = element_rect(colour = "black", fill=NA),
-        #legend.box.background = element_rect(colour = "black", size = 0.3)
         legend.position = "none",
         axis.text = element_text(colour = "black")) +
   labs(x = "Supplement use", y = expression(Plasma~vitamin~B[12]~", pmol/L"))
@@ -85,7 +84,6 @@ panel_b <- ggplot(data, aes(x=supplement_taker, y=habitual_dietary_b12, colour =
   geom_hline(aes(yintercept = 2.4), colour="black", linetype="dashed") +
   ggpubr::stat_pvalue_manual(stat.test, label = "p.signif", y.position = 900, vjust = 0.3,
                      tip.length = 0.005, label.size = 4, position = position_identity()) + # shortens length of bracket
-  #label = "Wilcoxon, p = {p}", 
   theme(panel.border = element_rect(colour = "black", fill=NA),
         legend.position = "none",
         axis.text.y.right = element_blank(),
@@ -100,7 +98,6 @@ panel_b <- ggplot(data, aes(x=supplement_taker, y=habitual_dietary_b12, colour =
 panel_b
 
 # ---- Figure 1C-D: Compare intake and plasma B12 status between the high/low intake groups ----
-
 data_high <- data %>%
   filter(intake_group == "High") 
 
@@ -137,11 +134,9 @@ panel_c <- ggplot(data, aes(x=intake_group, y=plasma_b12, colour = intake_group)
   geom_hline(aes(yintercept = 148), colour="black", linetype="dashed") + # replete range 
   geom_hline(aes(yintercept = 300), colour="black", linetype="dashed") + 
   ggpubr::stat_pvalue_manual(stat.test, label = "p.signif", y.position = 1400, position = position_identity(),
-                             #label = "Wilcoxon, p = {p}", 
                              tip.length = 0.005) + # shortens length of bracket
   scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
   theme(panel.border = element_rect(colour = "black", fill=NA),
-        #legend.box.background = element_rect(colour = "black", size = 0.3)
         legend.position = "none",
         axis.text = element_text(colour = "black")) +
   labs(x = expression(B[12] ~ "intake group relative to median"),
@@ -182,11 +177,9 @@ panel_d <- ggplot(data, aes(x=intake_group, y=habitual_dietary_b12, colour = int
 panel_d
 
 # ---- Design multi-panel plot ---- 
-
 design <- "
 AAABBCC
-AAADDEE
-"
+AAADDEE"
 
 # Note: plot4 object is generated from another script called "partial_and_kendall_correlations.R"
 ((panel_a + panel_b) / (panel_c + panel_d) | (plot4) ) + 

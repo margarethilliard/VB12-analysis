@@ -1,6 +1,7 @@
 
-# ---- Set up ----
+# Credit to Andrew Oliver for the code, sourced from here: https://github.com/aoliver44/SCFA-Analysis/blob/main/figure_scripts/Figure1.R
 
+# ---- Set up ----
 #install.packages(c("dplyr", "readr", "ggplot2", "bestNormalize", "car", "rstatix", "ggpubr", "wesanderson", "gtsummary", "kableExtra", "png", "patchwork", "cowplot", "ggcorrplot"))
 
 # Load libraries 
@@ -191,24 +192,14 @@ plot4 <- ggplot(as.data.frame(partial_regression$normalized_pred)) +
            size = 4,
            color = "red")
 
-plot4
+plot4 # FYI: this object ends up in the multi-panel Figure 1
 
 # --- Design multi-panel figure ----
 
 pw_plot <- plot1 + plot2 + plot3
 pw_plot
 
-design <- "
-AABBB
-AABBB
-"
-
-plot4 + pw_plot +
-  theme_bw(base_size = 18) +
-  plot_annotation(tag_levels = 'A')
-
 # ---- Kendall correlation ----
-
 corr_dat <- data %>%
   dplyr::select(plasma_b12,
                 eGFR,
@@ -262,5 +253,4 @@ corr_plot <- ggcorrplot::ggcorrplot(
                               expression(B[12]~from~supplements)))
 
 corr_plot
-
 # ggsave("figures/kendall-correlation-plot-with-signif.png", width = 8, height = 5)

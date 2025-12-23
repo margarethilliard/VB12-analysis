@@ -1,4 +1,5 @@
 # ---- Set up ---- 
+set.seed(8675309)
 
 #install.packages(c("readr", "dplyr", "tidyr", "ggpubr", "rstatix", "stringr", "ggplot2", "patchwork"))
 
@@ -17,7 +18,6 @@ setwd("/Users/local-margaret/Desktop/VB12-analysis")
 source("scripts/get_data.R")
 
 # ---- Read in pathway completion data from anvio-estimate-metabolism ---- 
-
 # Read in the module completness result file 
 res <- readr::read_delim("data/B12_biosynth-module_pathwise_completeness-MATRIX.txt") %>%
   select(-c("module", "module_name", "module_class", "module_category", "module_subcategory"))
@@ -38,7 +38,6 @@ data <- left_join(metadata_sub, res, by = "subject_id")
 data$pathwise_completion <- as.numeric(data$pathwise_completion)
 
 # ---- Data wrangling ---- 
-
 # Total number of medium-quality draft MAGs per subject ID 
 MAG_n <- readr::read_delim("/Users/local-margaret/Downloads/external_genomes_v2.txt") %>% 
   tidyr::separate(name, into = c("MAG", "subject_id", "number"), sep = "_") %>%
@@ -59,8 +58,7 @@ complete_b12 <- data %>%
 data_merged <- left_join(complete_b12, MAG_n) %>%
   mutate(prop_complete_b12 = n_complete_b12/n_MAGs)
 
-# ---- Plot 3A: differences in the proportion of MAGs with complete B12 synthesis pathway based on B12 intake group ---- 
-
+# ---- Plot 2A: differences in the proportion of MAGs with complete B12 synthesis pathway based on B12 intake group ---- 
 stat.test_res <-  rstatix::wilcox_test(prop_complete_b12 ~ intake_group, data = data_merged) %>%
   rstatix::add_significance() 
 
@@ -88,13 +86,12 @@ plot_A <- data_merged %>%
   theme(legend.position = "none",
         axis.text.x = element_text(color = "black")) +
   scale_y_continuous(breaks = seq(0, 1, by = 0.2)) + 
-  ggpubr::stat_pvalue_manual(stat.test_res, label = "p.signif", y.position = 0.22, vjust = 0.25,
+  ggpubr::stat_pvalue_manual(stat.test_res, label = "p", y.position = 0.22, vjust = 0.25,
                              tip.length = 0.05, label.size = 4, position = position_identity())  # shortens length of bracket
 
 plot_A
 
 # ---- Plot 3B: differences in the proportion of MAGs with complete B12 synthesis pathway based on supplement use ---- 
-
 stat.test_res <-  rstatix::wilcox_test(prop_complete_b12 ~ supplement_taker, data = data_merged) %>%
   rstatix::add_significance() 
 
@@ -126,8 +123,7 @@ plot_B <- data_merged %>%
 
 plot_B
 
-# ---- Patchwork plots together ---- 
-
+# ---- Design multi-panel figure ---- 
 plot_A + plot_B +
   plot_annotation(tag_levels = "A")
 

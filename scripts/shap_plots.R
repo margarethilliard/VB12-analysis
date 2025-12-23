@@ -14,7 +14,7 @@ library(cowplot)
 # Set working directory 
 setwd("/Users/local-margaret/Desktop/VB12_analysis/")
 
-# ---- Figure 5: predicting plasma B12 concentration from all participants ---- 
+# ---- Supplemental Figure 6: predicting plasma B12 concentration from all participants ---- 
 new_env <- new.env()
 load(file = "RF_analysis/rds_files/regression_plasmaB12~diet+microbiome_FULL_DATA.rds", envir = new_env)
 
@@ -78,7 +78,7 @@ df_sub <- df_sub %>%
   mutate(Feature = as.character(Feature))
 
 df_sub <- df_sub %>%
-  mutate(Tidy_Feature = recode(Feature,"d_bacteria_p_firmicutes_a_c_clostridia_o_oscillospirales_f_oscillospiraceae_g_dysosmobacter_s_dysosmobacter_sp001916835" = "Dysosmobacter sp001916835",
+  mutate(Tidy_Feature = dplyr::recode(Feature,"d_bacteria_p_firmicutes_a_c_clostridia_o_oscillospirales_f_oscillospiraceae_g_dysosmobacter_s_dysosmobacter_sp001916835" = "Dysosmobacter sp001916835",
                                "d_bacteria_p_proteobacteria_c_alphaproteobacteria_o_rf32" = "Alphaproteobacteria RF32",
                                "d_bacteria_p_firmicutes_c_bacilli_o_lactobacillales_f_streptococcaceae_g_streptococcus_s_streptococcus_thermophilus" = "Streptococcus thermophilus",
                                "d_bacteria_p_firmicutes_c_c_negativicutes_o_acidaminococcales_f_acidaminococcaceae_g_phascolarctobacterium" = "Phascolarctobacterium (genus)",
@@ -169,7 +169,7 @@ df_sub <- df_sub %>%
   mutate(Feature = as.character(Feature))
 
 df_sub <- df_sub %>%
-  mutate(Tidy_Feature = recode(Feature,
+  mutate(Tidy_Feature = dplyr::recode(Feature,
                                "d_bacteria_p_firmicutes_a_c_clostridia_o_lachnospirales_f_lachnospiraceae_g_am51_8" = "Lachnospiraceae AM51-8",
                                "d_bacteria_p_firmicutes_a_c_clostridia_o_lachnospirales_f_lachnospiraceae_g_cag_317" = "Lachnospiraceae CAG-317"))
 
@@ -245,7 +245,7 @@ df_sub <- df_sub %>%
   mutate(Feature = as.character(Feature))
 
 df_sub <- df_sub %>%
-  mutate(Tidy_Feature = recode(Feature,
+  mutate(Tidy_Feature = dplyr::recode(Feature,
                                "d_bacteria_p_firmicutes_a_c_clostridia_o_lachnospirales_f_lachnospiraceae_g_blautia_a_s_blautia_a_faecis" = "Blautia A faecis",
                                "d_bacteria_p_firmicutes_a_c_clostridia_o_lachnospirales_f_lachnospiraceae_g_mediterraneibacter_s_mediterraneibacter_lactaris" = "Mediterraneibacter lactaris"))
 
@@ -266,10 +266,15 @@ plot_D <- ggplot(df_sub, aes(x = Value, y = Svalue, color = Tidy_Feature)) +
 
 plot_D
 
-# ---- Patchwork plots together ----
+# ---- Design multi-panel figures ----
 shap_plot + dependence_plot_main + 
   plot_annotation(tag_levels = 'A') &
   theme(legend.position = "right") 
   
 #ggsave("figures/Shap_patchwork.pdf", width = 15, height = 10)
 
+(plot_A + plot_B) /
+  (plot_C + plot_D)  + 
+  plot_annotation(tag_levels = 'A')
+
+#ggsave("figures/Shap_intake_subset_patchwork.pdf", width = 15, height = 10)
