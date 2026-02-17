@@ -7,7 +7,7 @@ library(dplyr)
 library(tidyr)
 library(patchwork)
 
-# ---- Plot 7B: Propionate ~ pathways, low intake group ---- 
+# ---- Propionate ~ pathways, low intake group ---- 
 new_env <- new.env()
 load(file = "data/SHAP_objects/intake_subset/regression_propionate~pathways_low_intake.rds", envir = new_env)
 new_env$sv_full
@@ -90,7 +90,7 @@ plot_b <- ggplot(df_sub_up, aes(x = Value, y = Svalue, color = Tidy_Feature)) +
 
 plot_b
 
-# ---- Plot 7D: Butyrate ~ pathways, no supp use group ---- 
+# ---- Butyrate ~ pathways, no supp use group ---- 
 
 new_env <- new.env()
 load(file = "data/SHAP_objects/intake_subset/regression_butyrate~pathways_no_supp_users.rds", envir = new_env)
@@ -162,10 +162,10 @@ plot_c <- ggplot(df_sub_up, aes(x = Value, y = Svalue, color = Tidy_Feature)) +
                          "(for prediction of fecal butyrate)")),
        title= expression("Top features in no "  * B[12] * " supplement use subset")) +
   scale_color_discrete(type = c("#cc4778",
-                                "#f5db4c",
+                                "#0d0887",
                                 "#7e2482",
-                                "#969696",
-                                "#f89540")) +
+                                "peachpuff4",
+                                "#90d743")) +
   theme(legend.position = c(0.65,0.8), 
         #legend.position = "none",
         legend.background = element_rect(color = NA, fill = NA),
@@ -173,7 +173,7 @@ plot_c <- ggplot(df_sub_up, aes(x = Value, y = Svalue, color = Tidy_Feature)) +
 
 plot_c
 
-# ---- Plot 7C: Propionate ~ pathways, no supp use group ---- 
+# ---- Propionate ~ pathways, no supp use group ---- 
 
 new_env <- new.env()
 load(file = "data/SHAP_objects/intake_subset/regression_propionate~pathways_no_supp_users.rds", envir = new_env)
@@ -245,7 +245,7 @@ plot_d <- ggplot(df_sub_up, aes(x = Value, y = Svalue, color = Tidy_Feature)) +
        y=expression(atop("SHAP value",
                          "(for prediction of fecal propionate)")),
        title= expression("Top features in no "  * B[12] * " supplement use subset")) +
-  scale_color_discrete(type = c("#f5db4c",
+  scale_color_discrete(type = c("black",
                                 "#cc4778",
                                 "#7e2482",
                                 "#969696",

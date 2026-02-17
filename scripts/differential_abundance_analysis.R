@@ -3,7 +3,7 @@
 setwd("/Users/local-margaret/Desktop/VB12-analysis")
 source("scripts/get_data.R")
 
-# install.packages(c("ggplot2", "patchwork"))
+# install.packages(c("ggplot2"))
 library(ggplot2)
 
 # load maaslin3 package 
@@ -12,12 +12,12 @@ library(ggplot2)
 #BiocManager::install("biobakery/maaslin3")
 library(maaslin3)
 
-##### construct differential abundance models #####
+# ---- Build differential abundance models ----
 
 # make sure metadata is a data.frame (not tibble) for Maaslin3
 metadata <- as.data.frame(metadata_sub)
 
-# rownames need to be subject id for Maaslin3 
+# row names need to be subject id for Maaslin3 
 rownames(metadata) <- metadata$subject_id
 
 set.seed(1996)
@@ -42,17 +42,6 @@ fit_out_high_low <- maaslin3(input_data = gtdb_taxonomy,
                         min_abundance = 0.001,
                         cores = 1)
 
-
-fit_out_plasma <- maaslin3(input_data = gtdb_taxonomy,
-                    input_metadata = metadata,
-                    output = 'plasma_group_+fiber_output_GTDB',
-                    formula = '~ plasma_group + dt_fiber_sol',
-                    normalization = 'TSS',
-                    transform = 'LOG',
-                    min_prevalence = 0.25,
-                    min_abundance = 0.001,
-                    cores = 1)
-
 # ---- Box plots for differences in taxa abundance based on intake group ----
 transformed <- readr::read_delim("/Users/local-margaret/Desktop/VB12-analysis/diff_abundance_intake_grp+fiber_output_GTDB/features/data_transformed.tsv") %>%
   select(c(`feature`, `d__Bacteria|p__Firmicutes_A|c__Clostridia|o__Oscillospirales|f__Acutalibacteraceae|g__UBA1417|s__UBA1417_sp003531055`))
@@ -68,6 +57,10 @@ metadata_to_join$feature <- as.factor(metadata_to_join$feature)
 boxplot_data <- left_join(transformed, metadata_to_join, by = "feature") %>%
   na.exclude()
 
+# order the factor explicitly for plotting
+boxplot_data$intake_group <- factor(boxplot_data$intake_group, 
+                                    levels = c("Low", "High"))
+
 plot <- ggplot(boxplot_data, aes(x=intake_group, 
                                    y=`d__Bacteria|p__Firmicutes_A|c__Clostridia|o__Oscillospirales|f__Acutalibacteraceae|g__UBA1417|s__UBA1417_sp003531055`,
                                    colour = intake_group)) + 
@@ -76,7 +69,9 @@ plot <- ggplot(boxplot_data, aes(x=intake_group,
   stat_summary(fun = mean, geom = "point", 
                shape = 18, size = 3, colour = "black", 
                position = position_dodge(width = 0.75)) + 
-  scale_colour_manual(values = c("#e24f4a", "#969696")) +
+  scale_colour_manual(values = c("#969696", "#e24f4a")) +
+  scale_x_discrete(labels = c("Low"  = "Low (< 8.16 \u00B5g/d)",
+                              "High" = "High (> 8.16 \u00B5g/d)")) +
   theme_bw(base_size = 16) + 
   theme(panel.border = element_rect(colour = "black", fill=NA),
         legend.position = "none",
@@ -85,12 +80,12 @@ plot <- ggplot(boxplot_data, aes(x=intake_group,
         axis.text = element_text(colour = "black")) +
   labs(x = expression(
     atop(
-      B[12]~"intake group relative to median")),
+      B[12]~"intake group")),
     y = expression(
       atop(
         paste(italic("Acutalibacteraceae"), " UBA1417 abundance"),
         "(Normalization: TSS, Transformation: Log base 2)")),
-    subtitle = "FDR-corrected q = 0.007")
+    subtitle = "q = 0.007")
 
 plot
 

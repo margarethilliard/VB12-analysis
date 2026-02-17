@@ -37,7 +37,7 @@ wd10 <- "/Users/local-margaret/Desktop/VB12-analysis/data/intake_subset_analysis
 wd11 <- "/Users/local-margaret/Desktop/VB12-analysis/data/intake_subset_analysis/no_supp_use/pathways/propionate/"
 wd12 <- "/Users/local-margaret/Desktop/VB12-analysis/data/intake_subset_analysis/no_supp_use/pathways/butyrate/"
 
-## list all ml_results.csv files in sub-directories
+# list all ml_results.csv files in sub-directories
 file_paths1 <- list.files(path = wd1, pattern = "ml_results.csv", 
                                         recursive = TRUE, full.names = TRUE)
 file_paths2 <- list.files(path = wd2, pattern = "ml_results.csv", 
@@ -63,7 +63,7 @@ file_paths11 <- list.files(path = wd11, pattern = "ml_results.csv",
 file_paths12 <- list.files(path = wd11, pattern = "ml_results.csv", 
                            recursive = TRUE, full.names = TRUE)
 
-## combine the files for the respective data set 
+# combine the files for the respective data set 
 combined_results1 <- lapply(file_paths1, read.csv) %>% bind_rows() 
 combined_results2 <- lapply(file_paths2, read.csv) %>% bind_rows() 
 combined_results3 <- lapply(file_paths3, read.csv) %>% bind_rows() 
@@ -77,7 +77,7 @@ combined_results10 <- lapply(file_paths10, read.csv) %>% bind_rows()
 combined_results11 <- lapply(file_paths11, read.csv) %>% bind_rows() 
 combined_results12 <- lapply(file_paths12, read.csv) %>% bind_rows() 
 
-## add a column to define the model
+# add a column to define the model
 combined_results1$model <- "dietML_high_intake_acetate"
 combined_results2$model <- "dietML_high_intake_propionate"
 combined_results3$model <- "dietML_high_intake_butyrate"
@@ -94,7 +94,7 @@ combined_results10$model <- "dietML_no_supp_use_acetate"
 combined_results11$model <- "dietML_no_supp_use_propionate"
 combined_results12$model <- "dietML_no_supp_use_butyrate"
 
-## join the data 
+# join the data 
 joined_result <- full_join(combined_results1, combined_results2)
 joined_result <- full_join(joined_result, combined_results3)
 joined_result <- full_join(joined_result, combined_results4)
@@ -107,13 +107,13 @@ joined_result <- full_join(joined_result, combined_results10)
 joined_result <- full_join(joined_result, combined_results11)
 joined_result <- full_join(joined_result, combined_results12)
 
-## calculate percent change in MAE compared to null model
+# calculate percent change in MAE compared to null model
 combined_results <- joined_result %>% 
   janitor::clean_names() %>%
   dplyr::filter(., metric == "mae") %>%
   dplyr::mutate(., percent_change = ((estimate - null_model_avg) / (null_model_avg)*100)) 
 
-## do a global statistical test 
+# do a global statistical test 
 kruskal.test(percent_change ~ model, data = combined_results)
 
 ## do a post-hoc test if the global test p-value < 0.05  
@@ -138,7 +138,7 @@ letters_df <- data.frame(
 
 letters_df
 
-## calculate mean percent change for MAE (regression models)
+# calculate mean percent change for MAE (regression models)
 combined_results_mae <- combined_results %>% 
   dplyr::group_by(model) %>%
   dplyr::summarise(mean_percent_change = mean(percent_change),
@@ -195,18 +195,23 @@ combined_results_mae$group <- factor(
   combined_results_mae$group,
   levels = desired_order)
 
-## plot percent change in MAE compared to null model 
+group_labels <- c("Low intake" = "Low intake (< 8.16 µg/d)",
+                  "High intake" = "High intake (> 8.16 µg/d)")
+
+# plot percent change in MAE compared to null model 
 plot_1_pwys <- ggplot(combined_results_mae, aes(x = forcats::fct_rev(factor(model)), y = mean_percent_change)) +
-  geom_bar(aes(fill = group), stat = "identity", width = 0.75) +
+  geom_col(aes(fill = group), position = position_dodge(width = 0.8), color = "black") +
   geom_errorbar(aes(ymin = mean_percent_change - se_percent_change,
                     ymax = mean_percent_change + se_percent_change),
                 width = 0.2) +
+  scale_fill_manual(values = c("#969696", "#e24f4a",
+                               "#969696", "#e24f4a")) +
   geom_text(aes(label = letter, 
                 y = 5), # adjust vertical position
             size =5) +  ylab("Mean Percent Change in MAE\nCompared to Null Model") +
   xlab("") +
   theme_bw(base_size = 18) +
-  facet_wrap(~group, scales = "free_y") +
+  facet_wrap(~group, scales = "free_y", labeller = labeller(group = group_labels)) +
   scale_x_discrete(labels = response_labels) +
   theme(
     axis.text = element_text(colour = "black", size = 18),
@@ -223,7 +228,7 @@ plot_1_pwys <- ggplot(combined_results_mae, aes(x = forcats::fct_rev(factor(mode
 
 plot_1_pwys
 
-## same for r-squared
+# same for r-squared
 combined_results_rsq_summary <- joined_result %>%
   janitor::clean_names() %>%
   dplyr::filter(., metric == "rsq") %>%
@@ -247,26 +252,27 @@ combined_results_rsq_summary$group <- factor(
   combined_results_rsq_summary$group,
   levels = desired_order)
 
-## plot
+# plot
 plot_2_pwy <- ggplot(combined_results_rsq_summary, aes(x = forcats::fct_rev(factor(model)), y = mean_rsq)) +
-  geom_bar(aes(fill = group), stat = "identity", width = 0.75) +
+  geom_col(aes(fill = group), position = position_dodge(width = 0.8), color = "black") +
   geom_errorbar(aes(ymin = mean_rsq - se_rsq,
                     ymax = mean_rsq + se_rsq),
                 width = 0.2) +
   ylab(expression("Average Explained Variance (" * R^2 * ")")) +
   xlab("") +
   theme_bw(base_size = 18) +
-  facet_wrap(~group, scales = "free_y") +
+  facet_wrap(~group, scales = "free_y", labeller = labeller(group = group_labels)) +
   scale_x_discrete(labels = response_labels) +
-  theme(
-    axis.text = element_text(colour = "black", size = 18),
-    axis.text.y = ggtext::element_markdown(),
-    axis.title.x = element_text(size = 20),
-    axis.ticks.x = element_blank(),
-    legend.position = "none", 
-    strip.text = element_text(size = 20),
-    strip.background = element_blank(),
-    axis.text.x = element_text(color = "black", size = 20)) +
+  scale_fill_manual(values = c("#969696", "#e24f4a",
+                               "#969696", "#e24f4a")) +
+  theme(axis.text = element_text(colour = "black", size = 18),
+        axis.text.y = ggtext::element_markdown(),
+        axis.title.x = element_text(size = 20),
+        axis.ticks.x = element_blank(),
+        legend.position = "none", 
+        strip.text = element_text(size = 20),
+        strip.background = element_blank(),
+        axis.text.x = element_text(color = "black", size = 20)) +
   scale_y_continuous(breaks = seq(0, 0.20, by = 0.05)) + 
   coord_flip()
 
@@ -294,7 +300,7 @@ wd10 <- "/Users/local-margaret/Desktop/VB12-analysis/data/intake_subset_analysis
 wd11 <- "/Users/local-margaret/Desktop/VB12-analysis/data/intake_subset_analysis/no_supp_use/microbiome/propionate/"
 wd12 <- "/Users/local-margaret/Desktop/VB12-analysis/data/intake_subset_analysis/no_supp_use/microbiome/butyrate/"
 
-## list all ml_results.csv files in sub-directories
+# list all ml_results.csv files in sub-directories
 file_paths1 <- list.files(path = wd1, pattern = "ml_results.csv", 
                           recursive = TRUE, full.names = TRUE)
 file_paths2 <- list.files(path = wd2, pattern = "ml_results.csv", 
@@ -320,7 +326,7 @@ file_paths11 <- list.files(path = wd11, pattern = "ml_results.csv",
 file_paths12 <- list.files(path = wd11, pattern = "ml_results.csv", 
                            recursive = TRUE, full.names = TRUE)
 
-## combine the files for the respective data set 
+# combine the files for the respective data set 
 combined_results1 <- lapply(file_paths1, read.csv) %>% bind_rows() 
 combined_results2 <- lapply(file_paths2, read.csv) %>% bind_rows() 
 combined_results3 <- lapply(file_paths3, read.csv) %>% bind_rows() 
@@ -334,7 +340,7 @@ combined_results10 <- lapply(file_paths10, read.csv) %>% bind_rows()
 combined_results11 <- lapply(file_paths11, read.csv) %>% bind_rows() 
 combined_results12 <- lapply(file_paths12, read.csv) %>% bind_rows() 
 
-## add a column to define the model
+# add a column to define the model
 combined_results1$model <- "taxaHFE_ML_high_intake_acetate"
 combined_results2$model <- "taxaHFE_ML_high_intake_propionate"
 combined_results3$model <- "taxaHFE_ML_high_intake_butyrate"
@@ -351,7 +357,7 @@ combined_results10$model <- "taxaHFE_ML_no_supp_use_acetate"
 combined_results11$model <- "taxaHFE_ML_no_supp_use_propionate"
 combined_results12$model <- "taxaHFE_ML_no_supp_use_butyrate"
 
-## join the data 
+# join the data 
 joined_result <- full_join(combined_results1, combined_results2)
 joined_result <- full_join(joined_result, combined_results3)
 joined_result <- full_join(joined_result, combined_results4)
@@ -364,13 +370,13 @@ joined_result <- full_join(joined_result, combined_results10)
 joined_result <- full_join(joined_result, combined_results11)
 joined_result <- full_join(joined_result, combined_results12)
 
-## calculate percent change in MAE compared to null model
+# calculate percent change in MAE compared to null model
 combined_results <- joined_result %>% 
   janitor::clean_names() %>%
   dplyr::filter(., metric == "mae") %>%
   dplyr::mutate(., percent_change = ((estimate - null_model_avg) / (null_model_avg)*100)) 
 
-## do a global statistical test 
+# do a global statistical test 
 kruskal.test(percent_change ~ model, data = combined_results)
 
 ## do a post-hoc test if the global test p-value < 0.05  
@@ -395,7 +401,7 @@ letters_df <- data.frame(
 
 letters_df
 
-## calculate mean percent change for MAE (regression models)
+# calculate mean percent change for MAE (regression models)
 combined_results_mae <- combined_results %>% 
   dplyr::group_by(model) %>%
   dplyr::summarise(mean_percent_change = mean(percent_change),
@@ -451,9 +457,9 @@ combined_results_mae$group <- factor(
   combined_results_mae$group,
   levels = desired_order)
 
-## plot percent change in MAE compared to null model 
+# plot percent change in MAE compared to null model 
 plot_1_taxa <- ggplot(combined_results_mae, aes(x = forcats::fct_rev(factor(model)), y = mean_percent_change)) +
-  geom_bar(aes(fill = group), stat = "identity", width = 0.75) +
+  geom_col(aes(fill = group), position = position_dodge(width = 0.8), color = "black") +
   geom_errorbar(aes(ymin = mean_percent_change - se_percent_change,
                     ymax = mean_percent_change + se_percent_change),
                 width = 0.2) +
@@ -462,10 +468,11 @@ plot_1_taxa <- ggplot(combined_results_mae, aes(x = forcats::fct_rev(factor(mode
             size = 5) +  ylab("Mean Percent Change in MAE\nCompared to Null Model") +
   xlab("") +
   theme_bw(base_size = 18) +
-  facet_wrap(~group, scales = "free_y") +
+  facet_wrap(~group, scales = "free_y", labeller = labeller(group = group_labels)) +
   scale_x_discrete(labels = response_labels) +
-  theme(
-    axis.text = element_text(colour = "black", size = 18),
+  scale_fill_manual(values = c("#969696", "#e24f4a",
+                               "#969696", "#e24f4a")) +
+  theme(axis.text = element_text(colour = "black", size = 18),
     axis.text.y = ggtext::element_markdown(),
     axis.title.x = element_text(size = 20),
     axis.ticks.x = element_blank(),
@@ -479,9 +486,8 @@ plot_1_taxa <- ggplot(combined_results_mae, aes(x = forcats::fct_rev(factor(mode
   geom_hline(yintercept = 0, color = "black", linewidth = 1)
 
 plot_1_taxa
-#ggsave("figures/intake_subset_SHAP/microbes_MAE_subset_analysis.pdf", width =9, height = 5)
 
-## same for r-squared
+# same for r-squared
 combined_results_rsq_summary <- joined_result %>%
   janitor::clean_names() %>%
   dplyr::filter(., metric == "rsq") %>%
@@ -505,19 +511,20 @@ combined_results_rsq_summary$group <- factor(
   combined_results_rsq_summary$group,
   levels = desired_order)
 
-## plot
+# plot
 plot_2_taxa <- ggplot(combined_results_rsq_summary, aes(x = forcats::fct_rev(factor(model)), y = mean_rsq)) +
-  geom_bar(aes(fill = group), stat = "identity", width = 0.75) +
+  geom_col(aes(fill = group), position = position_dodge(width = 0.8), color = "black") +
   geom_errorbar(aes(ymin = mean_rsq - se_rsq,
                     ymax = mean_rsq + se_rsq),
                 width = 0.2) +
   ylab(expression("Average Explained Variance (" * R^2 * ")")) +
   xlab("") +
   theme_bw(base_size = 18) +
-  facet_wrap(~group, scales = "free_y") +
+  facet_wrap(~group, scales = "free_y", labeller = labeller(group = group_labels)) +
   scale_x_discrete(labels = response_labels) +
-  theme(
-    axis.text = element_text(colour = "black", size = 18),
+  scale_fill_manual(values = c("#969696", "#e24f4a",
+                               "#969696", "#e24f4a")) +
+  theme(axis.text = element_text(colour = "black", size = 18),
     axis.text.y = ggtext::element_markdown(),
     axis.title.x = element_text(size = 20),
     axis.ticks.x = element_blank(),

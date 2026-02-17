@@ -174,23 +174,26 @@ ktable %>%
 
 ## plot the partial regression 
 plot4 <- ggplot(as.data.frame(partial_regression$normalized_pred)) + 
-  aes(x = normalized_pred, y = normalized_resp, fill = "#969696") + 
-  geom_point(pch=21, colour="black", alpha = 0.75, size =1.5) + 
-  geom_smooth(method = "lm", color = "black", linetype = "dashed", se = TRUE) + 
-  scale_fill_manual(values = "#969696") + 
+  #aes(x = normalized_pred, y = normalized_resp, fill = "#969696") + 
+  aes(x = normalized_pred, y = normalized_resp) + 
+  #geom_point(pch=21, colour="black", alpha = 0.75, size =1.5) + 
+  geom_point(alpha = 0.6, size =1.5) + 
+  geom_smooth(method = "lm", color = "black", se = TRUE) + 
+  #scale_fill_manual(values = "#969696") + 
   theme_bw(base_size = 16) + 
   theme(panel.grid.minor = element_blank(), axis.text = element_text(colour = "black")) +
   labs(x = expression(Habitual~~B[12]~intake~"(normalized) | covariates")) +
   labs(y = expression(Plasma~vitamin~B[12]~"(normalized) | covariates"))+ 
   guides(color="none", fill = "none") +
   coord_cartesian(ylim = c(-3,3.25)) +
-  annotate("text", 
-           x = 0.8, 
-           y = 3.4, 
-           hjust = 0, vjust = 1, 
-           label = "Partial correlation\nPearson rho = 0.42\np < 0.001",
-           size = 4,
-           color = "red")
+  annotate("text",
+    x = 0.8,
+    y = 3.4,
+    hjust = 0, vjust = 1,
+    label = "Adj. R\u00B2 = 0.18\nbeta coef. = 0.42\np < 0.001",
+    size = 4,
+    color = "red")
+
 
 plot4 # FYI: this object ends up in the multi-panel Figure 1
 
@@ -198,59 +201,3 @@ plot4 # FYI: this object ends up in the multi-panel Figure 1
 
 pw_plot <- plot1 + plot2 + plot3
 pw_plot
-
-# ---- Kendall correlation ----
-corr_dat <- data %>%
-  dplyr::select(plasma_b12,
-                eGFR,
-                #b12_tnfs_avg,
-                habitual_dietary_b12, dt_vb12, dt_b12ad, daily_supplemented_b12,
-                age, sex, bmi)
-
-# check structure to ensure all variables are numeric 
-str(corr_dat)
-
-corr_dat <- corr_dat %>%
-  mutate(sex = ifelse(sex == "Male", 1, 0),# convert male/female to 1/0
-         age = as.numeric(age)) # convert age from integer to numeric
-
-# coefficients 
-coef <- round(cor(corr_dat, method = "kendall"), 1)
-
-# p-values 
-pvals <- ggcorrplot::cor_pmat(corr_dat, method = "kendall")
-pvals_adj <- apply(pvals, 2, function(x) p.adjust(x, method = "fdr"))
-
-# plotting 
-corr_plot <- ggcorrplot::ggcorrplot(
-    legend.title = "Kendall\ncorrelation\ncoefficient",
-    coef,
-    p.mat = pvals_adj,
-    hc.order = TRUE,
-    type = "lower",
-    insig = "blank",
-    lab = TRUE,
-    outline.col = "black") + 
-  theme(axis.text.y=element_text(size=12),
-        axis.text.x = element_text(size=12, angle=45)) +
-  # y labels start from bottom
-  scale_y_discrete(labels = c("Age",
-                              "Sex",
-                              expression(B[12]~from~foods),
-                              expression(Fortified~B[12]),
-                              "eGFR",
-                              "BMI",
-                              expression(Plasma~B[12]),
-                              expression(Habitual~B[12]~intake))) +
-  # x labs start from left 
-  scale_x_discrete(labels = c("Sex",
-                              expression(B[12]~from~foods),
-                              expression(Fortified~B[12]),
-                              "eGFR",
-                              "BMI",
-                              expression(Plasma~B[12]),
-                              expression(Habitual~B[12]~intake),
-                              expression(B[12]~from~supplements)))
-
-corr_plot
-# ggsave("figures/kendall-correlation-plot-with-signif.png", width = 8, height = 5)

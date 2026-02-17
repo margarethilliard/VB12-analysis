@@ -1,7 +1,8 @@
 
-# Credit to Sarah Blecksmith for the code, sourced from here: https://github.com/sblecksmith/CAZyme_project/blob/master/scripts/supplemental_figures.R
+# Credit goes to Sarah Blecksmith for the code, sourced from here: https://github.com/sblecksmith/CAZyme_project/blob/master/scripts/supplemental_figures.R
 
 # load libraries
+#install.packages(c("dplyr", "gt"))
 library(dplyr)
 library(gt)
 

@@ -4,7 +4,7 @@ ___________________
 
 This repository contains scripts for analyses presented in the following study (submission pending):
 
--   **Hilliard, M.A**, Oliver, A., Wilson, S.M.G., Shahab-Ferdows, S., Hampel, D., Stephensen C.B., Bennett, B.J.,  Allen, L.A., Lemay D.G. (2025). Diet and Microbiome Predictors of Plasma Vitamin B12 status in Healthy US Adults. 
+-   **Hilliard, M.A**, Oliver, A., Wilson, S.M.G., Shahab-Ferdows, S., Hampel, D., Bennett, B.J.,  Allen, L.A., Lemay D.G. (2026). Higher dietary vitamin B12 linked to lower fecal short-chain fatty acids and changes in gut microbial function in healthy United States adults. 
 
 ______________
 ### **Data availibility**

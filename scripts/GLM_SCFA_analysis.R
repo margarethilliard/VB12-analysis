@@ -5,6 +5,7 @@
 
 # Load libraries
 library(dplyr)
+library(ggplot2)
 library(purrr)
 library(tidyr)
 library(tibble)
@@ -29,12 +30,12 @@ data <- left_join(metadata_sub, scfa, by = "subject_id") %>%
 
 # Define response–predictor pairs
 model_pairs <- tibble::tibble(
-  response = c("acetate", "acetate","acetate", "acetate",
-               "propionate", "propionate", "propionate", "propionate",
-               "new_butyrate", "new_butyrate","new_butyrate", "new_butyrate"),
-  predictor = c("habitual_dietary_b12", "supplement_taker", "intake_group", "B12_tertile",
-                "habitual_dietary_b12", "supplement_taker", "intake_group", "B12_tertile",
-                "habitual_dietary_b12", "supplement_taker", "intake_group", "B12_tertile"))
+  response = c("acetate", "acetate","acetate", 
+               "propionate", "propionate", "propionate", 
+               "new_butyrate", "new_butyrate","new_butyrate"),
+  predictor = c("habitual_dietary_b12", "supplement_taker", "intake_group", 
+                "habitual_dietary_b12", "supplement_taker", "intake_group", 
+                "habitual_dietary_b12", "supplement_taker", "intake_group"))
 
 # Define reference groups for clear interpretation 
 data$intake_group <- as.factor(data$intake_group)
@@ -45,7 +46,7 @@ data$supplement_taker <- relevel(data$supplement_taker, ref = "No") # No = 1, Ye
 
 # Function to fit GLM adjusted for proper co-variate, extract results, check residuals and dispersion of simulated data 
 fit_glm_with_dharma <- function(response, predictor, data) {
-  formula <- as.formula(paste(response, "~", predictor, "+ age + sex + bmi + dt_fiber_sol + dt_prot_animal"))
+  formula <- as.formula(paste(response, "~", predictor, "+ age + sex + bmi + dt_fiber_sol + dietary_methionine"))
   model <- glm(formula, family = Gamma(link = "log"), data = data)
   
   # DHARMa simulation
@@ -103,11 +104,12 @@ all_results <- all_results %>%
 print(all_results)
 
 # Ignore significant associations with co-variates for now 
-all_results_main <- all_results %>% filter(term == "intake_groupHigh" | term == "supplement_takerYes")
+all_results_main <- all_results %>% 
+  filter(term == "intake_groupHigh" | term == "supplement_takerYes" | term == "habitual_dietary_b12")
 
-View(all_results_main)
+print(all_results_main)
 
-# ----- Plotting significant results ----- 
+# ----- Crude plotting of significant results ----- 
 ggplot(all_results_main, aes(x = percent_change, y = reorder(label, percent_change))) +
   geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
   geom_point(size = 3, color = "black") +
@@ -117,9 +119,7 @@ ggplot(all_results_main, aes(x = percent_change, y = reorder(label, percent_chan
   theme(axis.text = element_text(colour = "black", size = 18),
         axis.title.x = element_text(size = 18)) 
 
-# ggsave("figures/GLM_SCFA~intake.pdf", height = 5, width = 8)
-
-# ---- Estimated marginal means (EMMs) ----
+# ---- Estimated marginal means (EMMs) of categorical predictors ----
 model_pairs <- tibble::tibble(
   response = c("acetate", "acetate",
                "propionate", "propionate", 
@@ -130,7 +130,7 @@ model_pairs <- tibble::tibble(
 
 get_emm_df <- function(response, predictor, data) {
   # build models
-  formula <- as.formula(paste(response, "~", predictor, "+ age + sex + bmi + dt_fiber_sol + dt_prot_animal"))
+  formula <- as.formula(paste(response, "~", predictor, "+ age + sex + bmi + dt_fiber_sol + dietary_methionine"))
   model <- glm(formula, family = Gamma(link = "log"), data = data)
   
   # get EMMs and back-transform the response variable 
@@ -146,7 +146,7 @@ get_emm_df <- function(response, predictor, data) {
            predicted, SE, df, lower.CL, upper.CL)
   
   # Pairwise contrasts
-  contrast_obj <- contrast(emm, "pairwise")
+  contrast_obj <- emmeans::contrast(emm, method = "pairwise")
   contrast_df <- as.data.frame(contrast_obj)
   
   # Add confidence intervals
@@ -231,7 +231,7 @@ plot_1 <- emm_results %>%
   facet_wrap(~response_var, scales = "free_y") +
   scale_fill_manual(values = c("#969696", "#e24f4a")) +
   labs(x = expression(B[12] ~ "supplement use"),
-       y = "Predicted mean SCFA concentration\n(adjusted for covariates)") +
+       y = "SCFA concentration, nmol/mg\n(adjusted for covariates)") +
   theme_bw(base_size = 12) +
   theme(legend.position = "none",
         strip.text = element_text(size = 12), # "strip" = facet wrap label 
@@ -260,13 +260,16 @@ plot_2 <- emm_results %>%
                 width = 0.15, linewidth = 0.6) +
   facet_wrap(~response_var, scales = "free_y") +
   scale_fill_manual(values = c("#969696", "#e24f4a")) +
-  labs(x = expression(B[12] ~ "intake group relative to median"),
-       y = "Predicted mean SCFA concentration\n(adjusted for covariates)") +
+  labs(x = expression(B[12] ~ "intake group"),
+       y = "SCFA concentration, nmol/mg\n(adjusted for covariates)") +
+  scale_x_discrete(labels = c("Low"  = "Low (< 8.16 \u00B5g/d)",
+                              "High" = "High (> 8.16 \u00B5g/d)")) +
   theme_bw(base_size = 12) +
   theme(legend.position = "none",
         strip.text = element_text(size = 12),
         strip.background = element_blank(),
-        axis.text.x = element_text(color = "black")) +
+        axis.text.x = element_text(color = "black",
+                                   size = 8)) +
   ggpubr::stat_pvalue_manual(sig_labels_intake,
                              label = "label",
                              xmin = "group1",
@@ -275,13 +278,9 @@ plot_2 <- emm_results %>%
 
 plot_2
 
-#ggsave("figures/EMM_SCFA_intake_group.pdf", width = 8, height = 3)
-
 # ---- Design multi-panel plot ----
 plot_2 / plot_1+
   plot_annotation(tag_levels = 'A')
-
-#ggsave("figures/EMM_SCFA_patchwork_animal_protein_covariate.pdf", width = 8, height = 6)
 
 # ---- Dose response using estimated marginal slopes ----
 metadata_sub$sex <- as.factor(metadata_sub$sex)
@@ -303,7 +302,7 @@ data$habitual_b12_norm <- as.numeric(data$habitual_b12_norm)
 get_trend_df <- function(response, predictor, data) {
   
   # Fit GLM with Gamma log-link
-  formula <- as.formula(paste(response, "~", predictor, "+ age + sex + bmi + dt_fiber_sol + dt_prot_animal"))
+  formula <- as.formula(paste(response, "~", predictor, "+ age + sex + bmi + dt_fiber_sol + dietary_methionine"))
   model <- glm(formula, family = Gamma(link = "log"), data = data)
   
   # ---- 1. Marginal slope estimation ----
@@ -335,22 +334,23 @@ trend_results <- pmap_dfr(list(model_pairs$response, model_pairs$predictor),
                           get_trend_df,
                           data = data)
 
-# ---- 3. FDR correction for slopes ----
+# ---- 3. Wald two-tailed z-test to compute p-values, and FDR correction for slopes, if necessary ----
 trend_results <- trend_results %>%
-  mutate(p.value = 2 * pnorm(abs(slope / slope_SE), lower.tail = FALSE),
-         p.adj = p.adjust(p.value, method = "fdr"))
+  mutate(p.value = 2 * pnorm(abs(slope / slope_SE), lower.tail = FALSE))
+# null hypothesis is that slope = 0
+        #p.adj = p.adjust(p.value, method = "fdr"))
 
 trend_results
 
 trend_results %>%
   select(response_var, predictor_var,
-         slope, slope_SE, slope_lower.CL, slope_upper.CL, p.adj) %>%
+         slope, slope_SE, slope_lower.CL, slope_upper.CL, p.value) %>%
   tibble()
 
 # ---- 4. Plot model-based predicted curves ----
 data$acetate <- as.numeric(data$acetate)
 
-model_acetate <- glm(acetate ~ habitual_b12_norm + age + sex + bmi + dt_fiber_sol + dt_prot_animal,
+model_acetate <- glm(acetate ~ habitual_b12_norm + age + sex + bmi + dt_fiber_sol + dietary_methionine,
                      family = Gamma(link = "log"),
                      data = data)
 
@@ -361,7 +361,7 @@ emmip(model_acetate,
                                         length.out = 100)),
       type = "response")
 
-model_propionate <- glm(propionate ~ habitual_b12_norm + age + sex + bmi + dt_fiber_sol + dt_prot_animal,
+model_propionate <- glm(propionate ~ habitual_b12_norm + age + sex + bmi + dt_fiber_sol + dietary_methionine,
                         family = Gamma(link = "log"),
                         data = data)
 
@@ -372,7 +372,7 @@ emmip(model_propionate,
                                         length.out = 100)),
       type = "response")
 
-model_butyrate <- glm(new_butyrate ~ habitual_b12_norm + age + sex + bmi + dt_fiber_sol + dt_prot_animal,
+model_butyrate <- glm(new_butyrate ~ habitual_b12_norm + age + sex + bmi + dt_fiber_sol + dietary_methionine,
                       family = Gamma(link = "log"),
                       data = data)
 
@@ -394,15 +394,15 @@ get_emm_curve <- function(model, predictor, data, n_points = 200) {
   # Build 'at=' list dynamically
   at_list <- setNames(list(grid_vals), predictor)
   
-  # Get predictions across the grid
+  # Get predictions across the grid on original scale
   emm_grid <- emmeans(model,
                       specs = predictor,
                       at = at_list,
                       type = "response")
   
   as.data.frame(emm_grid) %>%
-    rename(pred = response) %>%
-    mutate(predictor_level = .data[[predictor]])
+    dplyr::rename(pred = response) %>%
+    dplyr::mutate(predictor_level = .data[[predictor]])
 }
 
 # --- Plot dose response curves ----
@@ -414,8 +414,8 @@ plot_emm_with_data <- function(model, predictor, response, data) {
   
   # Extract relevant raw data
   raw_df <- data %>%
-    select(predictor_level = all_of(predictor),
-           raw_response    = all_of(response))
+    dplyr::select(predictor_level = all_of(predictor),
+           raw_response = all_of(response))
   
   # Plot
   ggplot() +
@@ -431,13 +431,12 @@ plot_emm_with_data <- function(model, predictor, response, data) {
     geom_line(data = curve_df,
               aes(x = predictor_level, y = pred),
               linewidth = 1.2) +
-    labs(x = predictor,
-         y = response,
-         theme_classic(base_size = 14))
+    labs(x = predictor, y = response) +
+    theme_classic(base_size = 14)
 }
 
 # Acetate
-acetate_model <- glm(as.formula("acetate ~ habitual_b12_norm + age + sex + bmi + dt_fiber_sol + dt_prot_animal"),
+acetate_model <- glm(as.formula("acetate ~ habitual_b12_norm + age + sex + bmi + dt_fiber_sol + dietary_methionine"),
                      family = Gamma(link = "log"),
                      data = data)
 
@@ -448,19 +447,19 @@ acetate_plot <- plot_emm_with_data(acetate_model,
 
 acetate_plot <- acetate_plot + 
   labs(x = "") +
-  labs(y = "Predicted fecal acetate concentration\n(adjusted for covariates)") + 
-  annotate("text", 
-           x = 0.8, 
-           y = 60, 
-           hjust = 0, vjust = 1, 
-           label = "Marginal slope\np = 0.01",
-           size = 4,
-           color = "red")
+  labs(y = "Fecal acetate concentration, nmol/mg") + 
+  annotate("text",
+         x = Inf, y = Inf,
+         hjust = 1.1, vjust = 1.5,
+         label = paste0("Marginal slope\np = ",
+                        signif(trend_results$p.value[trend_results$response_var=="acetate"], 1)),
+         size = 4,
+         color = "red")
 
 acetate_plot
 
 # Proionate
-propionate_model <- glm(as.formula("propionate ~ habitual_b12_norm + age + sex + bmi + dt_fiber_sol + dt_prot_animal"),
+propionate_model <- glm(as.formula("propionate ~ habitual_b12_norm + age + sex + bmi + dt_fiber_sol + dietary_methionine"),
                         family = Gamma(link = "log"),
                         data = data)
 
@@ -471,22 +470,21 @@ propionate_plot <- plot_emm_with_data(propionate_model,
 
 propionate_plot <- propionate_plot + 
   labs(x = "") +
-  labs(y = "Predicted fecal propionate concentration\n(adjusted for covariates)") +
-  annotate("text", 
-           x = 0.8, 
-           y = 20, 
-           hjust = 0, vjust = 1, 
-           label = "Marginal slope\np = 0.02",
+  labs(y = "Fecal propionate concentration, nmol/mg") +
+  annotate("text",
+           x = Inf, y = Inf,
+           hjust = 1.1, vjust = 1.5,
+           label = paste0("Marginal slope\np = ",
+                          signif(trend_results$p.value[trend_results$response_var=="propionate"], 1)),
            size = 4,
            color = "red")
 
 propionate_plot
 
 # Butyrate
-butyrate_model <- glm(
-  as.formula("new_butyrate ~ habitual_b12_norm + age + sex + bmi + dt_fiber_sol + dt_prot_animal"),
-  family = Gamma(link = "log"),
-  data = data)
+butyrate_model <- glm(as.formula("new_butyrate ~ habitual_b12_norm + age + sex + bmi + dt_fiber_sol + dietary_methionine"),
+                      family = Gamma(link = "log"),
+                      data = data)
 
 butyrate_plot <- plot_emm_with_data(propionate_model,
                                     predictor = "habitual_b12_norm",
@@ -495,12 +493,12 @@ butyrate_plot <- plot_emm_with_data(propionate_model,
 
 butyrate_plot <- butyrate_plot + 
   labs(x = "") +
-  labs(y = "Predicted fecal butyrate concentration\n(adjusted for covariates)") +
-  annotate("text", 
-           x = 0.8, 
-           y = 30, 
-           hjust = 0, vjust = 1, 
-           label = "Marginal slope\np = 0.17",
+  labs(y = "Fecal butyrate concentration, nmol/mg") +
+  annotate("text",
+           x = Inf, y = Inf,
+           hjust = 1.1, vjust = 1.5,
+           label = paste0("Marginal slope\np = ",
+                          signif(trend_results$p.value[trend_results$response_var=="new_butyrate"], 1)),
            size = 4,
            color = "red")
 

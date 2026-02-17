@@ -32,7 +32,7 @@ data_non_users <- data %>%
 data_non_users %>%
   dplyr::summarise(mean = mean(habitual_dietary_b12))
 
-## Mann whitney U test 
+# Mann whitney U test 
 data$supplement_taker <- as.factor(data$supplement_taker)
 
 stat.test <- data %>%
@@ -52,8 +52,8 @@ panel_a <- ggplot(data, aes(x=supplement_taker, y=plasma_b12, colour = supplemen
   scale_colour_manual(values = c("#969696", "#e24f4a")) +
   labs(color='Supplement use') +
   theme_bw(base_size = 16) + 
-  geom_hline(aes(yintercept = 148), colour="black", linetype="dashed") + # replete range 
-  geom_hline(aes(yintercept = 300), colour="black", linetype="dashed") + 
+  geom_hline(aes(yintercept = 148), colour="black", linetype="dashed", size = 1.25) + # replete range 
+  geom_hline(aes(yintercept = 300), colour="black", linetype="dashed", size = 1.25) + 
   ggpubr::stat_pvalue_manual(stat.test, label = "p.signif", y.position = 1400, position = position_identity(),
                      tip.length = 0.005) + # shortens length of bracket
   scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
@@ -65,7 +65,7 @@ panel_a <- ggplot(data, aes(x=supplement_taker, y=plasma_b12, colour = supplemen
 
 panel_a
 
-## Do the same thing but for habitual intake 
+# Do the same thing but for habitual intake 
 stat.test <- data %>%
   ungroup() %>%
   rstatix::wilcox_test(data = ., habitual_dietary_b12 ~ supplement_taker)%>%
@@ -82,7 +82,7 @@ panel_b <- ggplot(data, aes(x=supplement_taker, y=habitual_dietary_b12, colour =
   scale_colour_manual(values = c("#969696", "#e24f4a")) +
   labs(color='Supplement use') +
   theme_bw(base_size = 16) + 
-  geom_hline(aes(yintercept = 2.4), colour="black", linetype="dashed") +
+  geom_hline(aes(yintercept = 2.4), colour="black", linetype="dashed", size = 1.25) +
   ggpubr::stat_pvalue_manual(stat.test, label = "p.signif", y.position = 900, vjust = 0.3,
                      tip.length = 0.005, label.size = 4, position = position_identity()) + # shortens length of bracket
   theme(panel.border = element_rect(colour = "black", fill=NA),
@@ -91,7 +91,7 @@ panel_b <- ggplot(data, aes(x=supplement_taker, y=habitual_dietary_b12, colour =
         axis.ticks.y = element_blank(),
         axis.text = element_text(colour = "black")) + 
   labs(x = expression(B[12] ~ "supplement use"),
-       y = expression(Habitual~vitamin~B[12]~" intake, " ~mu~g/d)) +
+       y = expression(Dietary~vitamin~B[12]~","~mu~g/d)) +
   ggbreak::scale_y_break(
     breaks = c(100, 145, 500, 735),  # Define where breaks happen
     scales = 0.2)  # Controls the size of the breaks (gap size between broken parts)
@@ -111,10 +111,10 @@ data_low <- data %>%
 data_low %>%
   dplyr::summarise(mean = mean(habitual_dietary_b12))
 
-## Mann whitney U test 
+# Mann whitney U test 
 data$intake_group <- as.factor(data$intake_group)
 
-## Re-order for consistent plotting
+# Re-order for consistent plotting
 data$intake_group <- factor(data$intake_group, levels = c("Low", "High"))
 
 stat.test <- data %>%
@@ -131,21 +131,24 @@ panel_c <- ggplot(data, aes(x=intake_group, y=plasma_b12, colour = intake_group)
                shape = 18, size = 3, colour = "black", 
                position = position_dodge(width = 0.75)) +
   scale_colour_manual(values = c("#969696", "#e24f4a")) +
+  scale_x_discrete(labels = c("Low"  = "Low (< 8.16 \u00B5g/d)",
+                              "High" = "High (> 8.16 \u00B5g/d)")) +
   theme_bw(base_size = 16) + 
-  geom_hline(aes(yintercept = 148), colour="black", linetype="dashed") + # replete range 
-  geom_hline(aes(yintercept = 300), colour="black", linetype="dashed") + 
+  geom_hline(aes(yintercept = 148), colour="black", linetype="dashed", size = 1.25) + # replete range 
+  geom_hline(aes(yintercept = 300), colour="black", linetype="dashed", size = 1.25) + 
   ggpubr::stat_pvalue_manual(stat.test, label = "p.signif", y.position = 1400, position = position_identity(),
                              tip.length = 0.005) + # shortens length of bracket
   scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
   theme(panel.border = element_rect(colour = "black", fill=NA),
         legend.position = "none",
-        axis.text = element_text(colour = "black")) +
-  labs(x = expression(B[12] ~ "intake group relative to median"),
+        axis.text = element_text(colour = "black"),
+        axis.text.x = element_text(size = 11)) +
+  labs(x = expression(B[12] ~ "intake group"),
        y = expression(Plasma~vitamin~B[12]~", pmol/L"))
 
 panel_c
 
-## Do the same thing but for habitual intake 
+# Do the same thing but for habitual intake 
 stat.test <- data %>%
   ungroup() %>%
   rstatix::wilcox_test(data = ., habitual_dietary_b12 ~ intake_group)%>%
@@ -160,17 +163,24 @@ panel_d <- ggplot(data, aes(x=intake_group, y=habitual_dietary_b12, colour = int
                shape = 18, size = 3, colour = "black", 
                position = position_dodge(width = 0.75)) +
   scale_colour_manual(values = c("#969696", "#e24f4a")) +
+  scale_x_discrete(labels = c("Low"  = "Low (< 8.16 \u00B5g/d)",
+                              "High" = "High (> 8.16 \u00B5g/d)")) +
   theme_bw(base_size = 16) + 
-  geom_hline(aes(yintercept = 2.4), colour="black", linetype="dashed") +
+  geom_hline(aes(yintercept = 2.4), colour="black", linetype="dashed", size = 1.25) +
   ggpubr::stat_pvalue_manual(stat.test, label = "p.signif", y.position = 900, vjust = 0.3,
                              tip.length = 0.005, label.size = 4, position = position_identity()) + # shortens length of bracket
   theme(panel.border = element_rect(colour = "black", fill=NA),
         legend.position = "none",
         axis.text.y.right = element_blank(),
         axis.ticks.y = element_blank(),
-        axis.text = element_text(colour = "black")) + 
-  labs(x = expression(B[12] ~ "intake group relative to median"),
-       y = expression(Habitual~vitamin~B[12]~" intake, " ~mu~g/d)) +
+        axis.text = element_text(colour = "black"),
+        axis.text.x = element_text(size = 11),
+        # add these because ggbreak adds x-axis labels to the top 
+        axis.text.x.top = element_blank(),
+        axis.ticks.x.top = element_blank(),
+        axis.title.x.top = element_blank()) + 
+  labs(x = expression(B[12] ~ "intake group"),
+       y = expression(Dietary~vitamin~B[12]~","~mu~g/d)) +
   ggbreak::scale_y_break(
     breaks = c(100, 145, 500, 735),  # Define where breaks happen
     scales = 0.2)  # Controls the size of the breaks (gap size between broken parts)
@@ -178,12 +188,20 @@ panel_d <- ggplot(data, aes(x=intake_group, y=habitual_dietary_b12, colour = int
 panel_d
 
 # ---- Design multi-panel plot ---- 
-design <- "
-AAABBCC
-AAADDEE"
 
-# Note: plot4 object is generated from another script called "partial_and_kendall_correlations.R"
+# Note: plot4 object is generated from another script called "partial_correlations.R"
 ((panel_c + panel_d) / (panel_a + panel_b) | (plot4) ) + 
   patchwork::plot_annotation(tag_levels = 'A')
 
-#ggsave("figures/boxplots.pdf", height = 10, width =18)
+# Note: venn_diagrams is generated from another script called "venn_diagram.R"
+(panel_d + panel_b) / (venn_diagrams) + 
+  patchwork::plot_annotation(tag_levels = 'A')
+
+#ggsave("figures/boxplots_v4.pdf", height = 10, width =18)
+ggsave("figures/boxplots_v4.pdf", height = 8, width = 10)
+
+(panel_c + panel_a) / (plot4) + 
+  patchwork::plot_annotation(tag_levels = 'A')
+
+ggsave("figures/boxplots_v5.pdf", height = 8, width = 10)
+

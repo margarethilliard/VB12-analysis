@@ -1,4 +1,5 @@
 # ---- Set up ---- 
+
 set.seed(8675309)
 
 #install.packages(c("readr", "dplyr", "tidyr", "ggpubr", "rstatix", "stringr", "ggplot2", "patchwork"))
@@ -79,9 +80,11 @@ plot_A <- data_merged %>%
                 position = position_dodge(width = 0.8),
                 width = 0.2) +
   scale_fill_manual(values = c("#969696", "#e24f4a")) +
-  labs(x = expression(B[12] ~ "intake group relative to median"),
+  labs(x = expression(B[12] ~ "intake group"),
        y = expression(atop("Proportion of total MAGs with complete", 
                            B[12] ~ " synthesis pathway"))) +
+  scale_x_discrete(labels = c("Low"  = "Low (< 8.16 \u00B5g/d)",
+                              "High" = "High (> 8.16 \u00B5g/d)")) +
   theme_bw(base_size = 12) +
   theme(legend.position = "none",
         axis.text.x = element_text(color = "black")) +

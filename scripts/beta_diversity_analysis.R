@@ -13,7 +13,7 @@ library(ggplot2)
 setwd("/Users/local-margaret/Desktop/VB12-analysis")
 source("scripts/get_data.R")
 
-# ---- Prepare data ----
+# ---- Prepare the data ----
 
 # use the transposed table where samples are rows, taxa are columns
 metaphlan_sub <- gtdb_taxonomy_sub %>%

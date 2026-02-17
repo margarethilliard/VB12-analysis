@@ -14,7 +14,7 @@ library(bestNormalize)
 setwd("/Users/local-margaret/Desktop/VB12-analysis")
 source("scripts/get_data.R")
 
-# ---- Prepare data ----
+# ---- Prepare the data ----
 
 # use the transposed abundance table where samples are rows, taxa are columns
 metaphlan_sub <- gtdb_taxonomy_sub %>%
