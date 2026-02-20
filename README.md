@@ -10,7 +10,7 @@ ______________
 ### **Data availibility**
 ___________________
 
-- Metagenomes are deposited in NCBI Sequence Read Archive (SRA) under the [study accession SRP354271](https://dataview.ncbi.nlm.nih.gov/object/PRJNA795985) and [BioProject PRJNA1090850](https://www.ncbi.nlm.nih.gov/bioproject/?term=PRJNA1090850). 
+- Metagenomes are deposited in NCBI Sequence Read Archive (SRA) under the BioProject accession numbers [PRJNA795985](https://www.ncbi.nlm.nih.gov/bioproject/795985) and [PRJNA1090850](https://www.ncbi.nlm.nih.gov/bioproject/?term=PRJNA1090850). 
 - Requests for non-metagenomic data from the USDA-ARS WHNRC Nutritional Phenotyping Study used in this analysis should be made via email to the senior author. Requests will be reviewed quarterly by a committee consisting of the study investigators.
 
 ____________
