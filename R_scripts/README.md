@@ -1,6 +1,6 @@
 ## Scripts for analyses and visualizations in FL100 VB12 x microbiome project
 
-### Main Text:
+### Main text figures:
 - Figure 1 A-B: boxplots.R
 - Figure 1 C: partial_correlations.R
 - Figure 2 A-B: boxplots.R
@@ -20,6 +20,6 @@
 
 ### Notes:
 - Most scripts source the merged and cleaned data frames using "get_data.R" which is a great way to save time, be consistent, and make the analysis slightly more portable. Highly recommend.
-- R analyses and visualizations were run locally on a MacBook Pro (Apple M3 Max chip).
+- R analyses and visualizations were run locally on a MacBook Pro (Apple M3 Max chip). 
 - CONSORT diagram was made manually in PowerPoint, where the format was largely derived from Sarah Blecksmith's paper [linked here](https://pubmed.ncbi.nlm.nih.gov/40902732/)
 - Supplemental Table 3 was modified from Iva Veseli's Github repo [linked here](https://github.com/ivagljiva/custom_biosynthesis_modules/blob/main/USER_MODULES/modules/B12_01)

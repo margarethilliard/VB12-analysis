@@ -1,9 +1,3 @@
----
-output:
-  pdf_document: default
-  html_document: default
----
-
 ## DietML and TaxaHFE workflow on HIVE for FL100 VB12 x microbiome project
 - Written by: Margaret A. Hilliard, last updated on Feb. 20, 2026
 - A note on resource usage: For this analysis I used array job scripts that were executed on HIVE, a slurm-based HPC cluster managed by the High Performance Computing Core Facility at the University of California Davis.
@@ -14,15 +8,15 @@ output:
 |------|------|--------------|
 | 1. scfa_metadata.csv | intake_subset_analyses/data/ | contains subject_id,new_butyrate,acetate,propionate,age,sex,bmi,dt_fiber_sol,intake_group,supplement_taker variables |
 | 2. pathways_metadata.csv | intake_subset_analyses/data/ | contains HUMAnN 3.0 pathways (columns) and subject_ids (rows) + all covariate variables listed in scfa_metadata.csv |
-| 3. modified_merged_metaphlan_v4-0-6_GTDB.txt | intake_subset_analyses/data/ | Shared microbiome input file used for all models. This version was converted to GTDB taxonomy from the merged metaphlan4 table using this utility script: https://github.com/biobakery/MetaPhlAn/blob/master/metaphlan/utils/sgb_to_gtdb_profile.py. IMPORTANT NOTE: the GTDB taxa table was further modified by changing the delimiter in the header to '|' to be compliant with taxaHFE-ML's expected delimiter! |
-| 4. random_seeds.txt | intake_subset_analyses/ | One seed per line to generate reproducible random searches. If you need to generate a list of random seeds, you can use scripts/generate_100_random_seeds.sh. I've also provided the random_seed.txt file I've used.|
+| 3. modified_merged_metaphlan_v4-0-6_GTDB.txt | intake_subset_analyses/data/ | Shared microbiome input file used for all TaxaHFE-ML models. This version was converted to GTDB taxonomy from the merged MetaPhlAn4 table using [this utility script](https://github.com/biobakery/MetaPhlAn/blob/master/metaphlan/utils/sgb_to_gtdb_profile.py). IMPORTANT NOTE: the GTDB taxa table was further modified by changing the delimiter in the header to a pipe (|) to be compliant with taxaHFE-ML's expected delimiter! |
+| 4. random_seeds.txt | intake_subset_analyses/ | One seed (four digit number) per line, without a header, to generate reproducible random searches. If you need to generate this file, you can use scripts/generate_100_random_seeds.sh, and modify it to make longer/shorter seeds if needed. |
 
  Workflow overview 
  ------------------
 
 1. Navigate to project root directory and generate nested output directories and subset the input metadata files based on B12 intake group and supplement use. 
 ```bash
-cd /path/to/project_root
+cd /path/to/project_root/intake_subset_analyses/
 bash scripts/shared_subset_analysis_setup.sh
 ```
 - Input 1: scfa_metadata.csv Example format:
@@ -63,48 +57,49 @@ squeue --me # check the job status
 ```
 Required directory structure:
 -----------------------
-
-#intake_subset_analyses/ 
-#├── data/ 
-#│   ├── high_intake_acetate_metadata.csv
-#│   ├── high_intake_butyrate_metadata.csv
-#│   ├── high_intake_propionate_metadata.csv
-#│   ├── low_intake_acetate_metadata.csv
-#│   ├── ...                                        # subsetted metadata files generated using shared_subset_analysis_setup.sh go here 
-#│   └── modified_merged_metaphlan_v4-0-6_GTDB.txt  # shared microbiome file
-#├── high_intake/
-#│   └── microbiome/
-#│       ├── acetate/
-#│       │   └── commands/                          # scripts from generate_taxaHFE_ML_commands.sh go here
-#│       ├── butyrate/
-#│       │   └── commands/
-#│       └── propionate/
-#│           └── commands/
-#│   └── pathways/
-#│       ├── acetate/
-#│       │   └── commands/                          # scripts from generate_dietML_commands.sh go here
-#│       ├── butyrate/
-#│       │   └── commands/
-#│       └── propionate/
-#│           └── commands/
-#├── low_intake/
-#│   └── microbiome/
-#│       └── ...
-#│   └── pathways/
-#│       └── ...
-#├── no_supp_use/
-#│   └── microbiome/
-#│       └── ...
-#│   └── pathways/
-#│       └── ...
-#├── supp_use/
-#│   └── microbiome/
-#│       └── ...
-#│   └── pathways/
-#│       └── ...
-#└── scripts/
-#    └── shared_subset_analysis_setup.sh
-#    └── generate_dietML_commands.sh
-#    └── generate_taxaHFE_ML_commands.sh
-#    └── ...
-#├── random_seeds.txt                               # can be generated from generate_100_random_seeds.sh if needed 
+```
+# intake_subset_analyses/ 
+# ├── data/ 
+# │   ├── high_intake_acetate_metadata.csv
+# │   ├── high_intake_butyrate_metadata.csv
+# │   ├── high_intake_propionate_metadata.csv
+# │   ├── low_intake_acetate_metadata.csv
+# │   ├── ...                                        # subsetted metadata files generated using shared_subset_analysis_setup.sh go here 
+# │   └── modified_merged_metaphlan_v4-0-6_GTDB.txt  # shared microbiome file
+# ├── high_intake/
+# │   └── microbiome/
+# │       ├── acetate/
+# │       │   └── commands/                          # scripts from generate_taxaHFE_ML_commands.sh go here
+# │       ├── butyrate/
+# │       │   └── commands/
+# │       └── propionate/
+# │           └── commands/
+# │   └── pathways/
+# │       ├── acetate/
+# │       │   └── commands/                          # scripts from generate_dietML_commands.sh go here
+# │       ├── butyrate/
+# │       │   └── commands/
+# │       └── propionate/
+# │           └── commands/
+# ├── low_intake/
+# │   └── microbiome/
+# │       └── ...
+# │   └── pathways/
+# │       └── ...
+# ├── no_supp_use/
+# │   └── microbiome/
+# │       └── ...
+# │   └── pathways/
+# │       └── ...
+# ├── supp_use/
+# │   └── microbiome/
+# │       └── ...
+# │   └── pathways/
+# │       └── ...
+# └── scripts/
+#     └── shared_subset_analysis_setup.sh
+#     └── generate_dietML_commands.sh
+#     └── generate_taxaHFE_ML_commands.sh
+#     └── ...
+# ├── random_seeds.txt                               # can be generated from generate_100_random_seeds.sh if needed 
+```

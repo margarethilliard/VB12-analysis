@@ -18,7 +18,7 @@ ____________
 _______________
 
 - R v4.4.3 & RStudio v2024.12.1+563
-- [TaxaHFE-ML](https://github.com/aoliver44/taxaHFE) & [dietML](https://github.com/aoliver44/nutrition_tools)
+- [TaxaHFE-ML](https://github.com/aoliver44/taxaHFE) & [DietML](https://github.com/aoliver44/nutrition_tools)
 - Apptainer v1.4.3
 - GNU Parallel v20220522 (optional)
 - Conda v25.1.0
