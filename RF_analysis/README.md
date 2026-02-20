@@ -8,7 +8,7 @@
 |------|------|--------------|
 | 1. scfa_metadata.csv | intake_subset_analyses/data/ | contains subject_id,new_butyrate,acetate,propionate,age,sex,bmi,dt_fiber_sol,intake_group,supplement_taker variables |
 | 2. pathways_metadata.csv | intake_subset_analyses/data/ | contains HUMAnN 3.0 pathways (columns) and subject_ids (rows) + all covariate variables listed in scfa_metadata.csv |
-| 3. modified_merged_metaphlan_v4-0-6_GTDB.txt | intake_subset_analyses/data/ | Shared microbiome input file used for all TaxaHFE-ML models. This version was converted to GTDB taxonomy from the merged MetaPhlAn4 table using [this utility script](https://github.com/biobakery/MetaPhlAn/blob/master/metaphlan/utils/sgb_to_gtdb_profile.py). IMPORTANT NOTE: the GTDB taxa table was further modified by changing the delimiter in the header to a pipe (|) to be compliant with taxaHFE-ML's expected delimiter! |
+| 3. modified_merged_metaphlan_v4-0-6_GTDB.txt | intake_subset_analyses/data/ | Shared microbiome input file used for all TaxaHFE-ML models. This version was converted to GTDB taxonomy from the merged MetaPhlAn4 table using [this utility script](https://github.com/biobakery/MetaPhlAn/blob/master/metaphlan/utils/sgb_to_gtdb_profile.py). IMPORTANT NOTE: the GTDB taxa table was further modified by changing the delimiter in the header to a pipe to be compliant with TaxaHFE-ML's expected delimiter! |
 | 4. random_seeds.txt | intake_subset_analyses/ | One seed (four digit number) per line, without a header, to generate reproducible random searches. If you need to generate this file, you can use scripts/generate_100_random_seeds.sh, and modify it to make longer/shorter seeds if needed. |
 
  Workflow overview 
