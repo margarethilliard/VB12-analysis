@@ -1,5 +1,6 @@
 ## DietML and TaxaHFE workflow on HIVE for FL100 VB12 x microbiome project
 - Written by: Margaret A. Hilliard, last updated on Feb. 20, 2026
+- The following analyses predict short-chain fatty acid concentrations from either gut microbiome composition, or gut microbial pathway abundances from four different subsets of participants based on dietary intake of vitamin B12.
 - A note on resource usage: For this analysis I used array job scripts that were executed on HIVE, a slurm-based HPC cluster managed by the High Performance Computing Core Facility at the University of California Davis.
 
  ##  Input file summary
