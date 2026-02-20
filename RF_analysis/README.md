@@ -66,6 +66,7 @@ Required directory structure:
 # │   ├── low_intake_acetate_metadata.csv
 # │   ├── ...                                        # subsetted metadata files generated using shared_subset_analysis_setup.sh go here 
 # │   └── modified_merged_metaphlan_v4-0-6_GTDB.txt  # shared microbiome file
+# ├── random_seeds.txt                               # can be generated from generate_100_random_seeds.sh if needed 
 # ├── high_intake/
 # │   └── microbiome/
 # │       ├── acetate/
@@ -101,5 +102,4 @@ Required directory structure:
 #     └── generate_dietML_commands.sh
 #     └── generate_taxaHFE_ML_commands.sh
 #     └── ...
-# ├── random_seeds.txt                               # can be generated from generate_100_random_seeds.sh if needed 
 ```
