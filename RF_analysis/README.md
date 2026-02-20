@@ -37,9 +37,9 @@ bash scripts/generate_dietML_commands.sh # for pathway data
 ```
 - You can change the parameters to your liking (See "Define metabolite-specific hyperparameters" section) and use your own list of random seeds for reproducibility. 
 - Input 1a: data/*_metadata.csv. These are subset- and metabolite-specific metadata files that follow the naming pattern: <subset>_<metabolite>_metadata.csv. If the file says "pathways" it also contains the HUMAnN 3.0 pathways associated with the subset of samples, and will be the sole input to DietML. These files can be generated using scripts/subset_analysis_setup.sh
-- Input 1b: modified_merged_metaphlan_v4-0-6_GTDB.txt. Shared microbiome input file used for all microbiome models. This version was converted to GTDB taxonomy from the merged metaphlan4 table using this utility script: https://github.com/biobakery/MetaPhlAn/blob/master/metaphlan/utils/sgb_to_gtdb_profile.py. IMPORTANT NOTE: the GTDB taxa table was further modified by changing the delimiter in the header to '|' to be compliant with taxaHFE-ML's expected delimiter! 
-- Input 2: random_seeds.txt. One seed per line to generate reproducible random searches. If you need to generate a list of random seeds, you can use scripts/generate_100_random_seeds.sh. I've also provided the random_seed.txt file I've used. 
-- Output:  12 subset- and metabolite-specific command files placed in nested directories (something like: intake_subset_analyses/subset_of_interest/)
+- Input 1b: modified_merged_metaphlan_v4-0-6_GTDB.txt 
+- Input 2: random_seeds.txt
+- Output: 12 subset- and metabolite-specific command files placed in appropriate nested directories 
 
 2. Generate DietML and TaxaHFE-ML array job scripts for all subsets/metabolite combinations:
 ```bash
