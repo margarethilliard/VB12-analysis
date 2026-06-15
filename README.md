@@ -2,9 +2,9 @@ ______________
 ### **Summary**
 ___________________
 
-This repository contains scripts for analyses presented in the following study (submission pending):
+This repository contains scripts for analyses presented in the following study (under review):
 
--   **Hilliard, M.A**, Oliver, A., Wilson, S.M.G., Shahab-Ferdows, S., Hampel, D., Bennett, B.J.,  Allen, L.A., Lemay D.G. (2026). Higher dietary vitamin B12 linked to lower fecal short-chain fatty acids and changes in gut microbial function in healthy United States adults. 
+-   **Hilliard, M.A**, Oliver, A., Wilson, S.M.G., Shahab-Ferdows, S., Hampel, D., Bennett, B.J.,  Allen, L.A., Lemay D.G. (2026). High dietary B12 is associated with reduced gut microbial B12 biosynthesis capacity and lower fecal short-chain fatty acids in healthy United States adults. 
 
 ______________
 ### **Data availibility**
@@ -18,7 +18,7 @@ ____________
 _______________
 
 - R v4.4.3 & RStudio v2024.12.1+563
-- [TaxaHFE-ML](https://github.com/aoliver44/taxaHFE) & [DietML](https://github.com/aoliver44/nutrition_tools)
+- [TaxaHFE-ML & DietML](https://github.com/aoliver44/taxaHFE)
 - Apptainer v1.4.3
 - GNU Parallel v20220522 (optional)
 - Conda v25.1.0
