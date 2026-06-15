@@ -24,13 +24,13 @@ library(ggcorrplot)
 setwd("/Users/local-margaret/Desktop/VB12-analysis")
 source("scripts/get_data.R")
 
-data <- metadata_sub # subset that has microbiome data available 
+data <- metadata_sub # subset that has microbiome and plasma B12 data available 
 
 data <- full_join(data, scfa, by = "subject_id") %>%
   na.exclude()
 
 length(data$subject_id)
-# [1] 247
+# [1] 240
 
 met_norm <- bestNormalize::bestNormalize(data$dietary_methionine)
 print(met_norm)
@@ -48,7 +48,7 @@ corr_dat <- data %>%
 
 # ---- Partial correlations for in-text reference ----
 
-# dietary methionine and vitamin B12 were correlated with each other (partial Spearman’s rho = 0.27, p < 0.001)
+# dietary methionine and vitamin B12 were correlated with each other 
 library(ppcor)
 result_pcor <- ppcor::pcor.test(
   x = corr_dat$habitual_dietary_b12,
@@ -58,7 +58,7 @@ result_pcor <- ppcor::pcor.test(
 
 print(result_pcor)
 
-# a relationship which strengthened when analyzing only participants in the no B12 supplement use group (partial Spearman’s rho = 0.58, p < 0.001) 
+# a relationship which strengthened when analyzing only participants in the no B12 supplement use group 
 corr_dat_no_supp  <- corr_dat %>%
   dplyr::filter(supplement_taker == "No")
 
@@ -70,7 +70,7 @@ result_pcor <- ppcor::pcor.test(
 
 print(result_pcor)
 
-# and disappeared when looking at the supplement use group (partial Spearman’s rho = -0.05, p = 0.6).
+# and disappeared when looking at the supplement use group 
 corr_dat_supp <- corr_dat %>%
   dplyr::filter(supplement_taker == "Yes")
 
@@ -82,7 +82,7 @@ result_pcor <- ppcor::pcor.test(
 
 print(result_pcor)
 
-# To our surprise, we found  that dietary methionine was not correlated with fecal acetate (partial Spearman’s rho = 0.08, p = 0.2)
+# To our surprise, we found  that dietary methionine was not correlated with fecal acetate 
 result_pcor <- ppcor::pcor.test(
   x = corr_dat$dietary_methionine,
   y = corr_dat$acetate,
@@ -91,7 +91,7 @@ result_pcor <- ppcor::pcor.test(
 
 print(result_pcor)
 
-# propionate (partial Spearman’s rho = 0.09, p = 0.2), 
+# propionate 
 result_pcor <- ppcor::pcor.test(
   x = corr_dat$dietary_methionine,
   y = corr_dat$propionate,
@@ -100,7 +100,7 @@ result_pcor <- ppcor::pcor.test(
 
 print(result_pcor)
 
-# or butyrate (partial Spearman’s rho = 0.05, p = 0.4) after controlling for age, sex, BMI, soluble dietary fiber, and dietary B12. 
+# or butyrateafter controlling for age, sex, BMI, soluble dietary fiber, and dietary B12. 
 result_pcor <- ppcor::pcor.test(
   x = corr_dat$dietary_methionine,
   y = corr_dat$new_butyrate,
@@ -109,7 +109,7 @@ result_pcor <- ppcor::pcor.test(
 
 print(result_pcor)
 
-# In contrast, we found that dietary B12 was negatively correlated with fecal acetate (partial Spearman’s rho = -0.19, p < 0.004)
+# In contrast, we found that dietary B12 was negatively correlated with fecal acetate 
 result_pcor <- ppcor::pcor.test(
   x = corr_dat$habitual_dietary_b12,
   y = corr_dat$acetate,
@@ -118,7 +118,7 @@ result_pcor <- ppcor::pcor.test(
 
 print(result_pcor)
 
-# and propionate (partial Spearman’s rho = -0.14, p = 0.03) after controlling for age, sex, BMI, soluble dietary fiber and dietary methionine. 
+# and propionate after controlling for age, sex, BMI, soluble dietary fiber and dietary methionine. 
 result_pcor <- ppcor::pcor.test(
   x = corr_dat$habitual_dietary_b12,
   y = corr_dat$propionate,
@@ -127,7 +127,7 @@ result_pcor <- ppcor::pcor.test(
 
 print(result_pcor)
 
-# We did not find that dietary B12 was correlated with fecal butyrate (partial Spearman’s rho = -0.1, p = 0.1). 
+# We did not find that dietary B12 was correlated with fecal butyrate
 result_pcor <- ppcor::pcor.test(
   x = corr_dat$habitual_dietary_b12,
   y = corr_dat$new_butyrate,
@@ -155,8 +155,8 @@ plot_A <- ggplot(corr_dat, aes(x=intake_group, y=dietary_methionine, colour = in
                shape = 18, size = 3, colour = "black", 
                position = position_dodge(width = 0.75)) +
   scale_colour_manual(values = c("#969696", "#e24f4a")) +
-  scale_x_discrete(labels = c("Low"  = "Low (< 8.16 \u00B5g/d)",
-                              "High" = "High (> 8.16 \u00B5g/d)")) +
+  scale_x_discrete(labels = c("Low"  = "Adequate\n(< 8.51 \u00B5g/d)",
+                              "High" = "High\n(> 8.51 \u00B5g/d)")) +
   labs(color='Intake group') +
   theme_bw(base_size = 16) +
   theme(panel.border = element_rect(colour = "black", fill=NA),
@@ -166,6 +166,8 @@ plot_A <- ggplot(corr_dat, aes(x=intake_group, y=dietary_methionine, colour = in
        y = "Dietary methionine, grams/day") +
   ggpubr::stat_pvalue_manual(stat.test, label = "p.signif", y.position = 5, position = position_identity(),
                              tip.length = 0.005) # shortens length of bracket
+
+plot_A
 
 # ---- Supplement use/no use boxplots ----
 
@@ -193,6 +195,8 @@ plot_B <- ggplot(corr_dat, aes(x=supplement_taker, y=dietary_methionine, colour 
        y = "Dietary methionine, grams/day") +
   ggpubr::stat_pvalue_manual(stat.test, label = "p.signif", y.position = 5, position = position_identity(),
                              tip.length = 0.005) # shortens length of bracket
+
+plot_B
 
 # ---- High/low intake partial regressions ----
 
@@ -241,8 +245,10 @@ plot_C <- ggplot(combined_data) +
   aes(x = normalized_pred, y = normalized_resp, color = intake_group, fill = intake_group) + 
   geom_point(alpha = 0.6, size = 1.5) + 
   geom_smooth(method = "lm", se = TRUE, alpha = 0.2) + 
-  scale_color_manual(values = c("Low" = "#969696", "High" = "#e24f4a")) +
-  scale_fill_manual(values = c("Low" = "#969696", "High" = "#e24f4a")) +
+  scale_color_manual(values = c("Low" = "#969696", "High" = "#e24f4a"),
+                     labels = c("Low" = "Adequate", "High" = "High" )) +
+  scale_fill_manual(values = c("Low" = "#969696", "High" = "#e24f4a"),
+                    labels = c("Low" = "Adequate", "High" = "High" )) +
   theme_bw(base_size = 16) + 
   theme(panel.grid.minor = element_blank(), 
         axis.text = element_text(colour = "black"),
@@ -264,6 +270,8 @@ plot_C <- ggplot(combined_data) +
            size = 4,
            color = "#e24f4a",
            hjust = 0)
+
+plot_C
 
 # ---- Supplement use/no use partial regressions ----
 
@@ -335,10 +343,11 @@ plot_D <- ggplot(combined_data) +
            size = 4,
            color = "#e24f4a",
            hjust = 0)
+plot_D
 
 # ---- Final patchwork plot ----
 (plot_C + plot_A ) /
   (plot_D + plot_B) + 
   plot_annotation(tag_levels = 'A')
   
-#ggsave("figures/methionine_relationship_with_B12_patchwork.pdf", height = 10, width =18)
+# ggsave("figures/SUPP_FIGURE3_revision.pdf", height = 10, width =18)

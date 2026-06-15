@@ -97,11 +97,11 @@ for (predictor in predictors) {
 stats_df <- do.call(rbind, stats)
 
 # multiple comparison corrections 
-stats_df$FDR_p_value <- p.adjust(stats_df$p_val_raw, method = "fdr")
+stats_df$FDR_p_value <- p.adjust(stats_df$p_value, method = "fdr")
 
 # clean up the table 
 stats_df <- stats_df %>%
-  select(-c(p_val_raw....p_val))
+  dplyr::select(c(Metric, Predictor, p_value, FDR_p_value))
 
 rownames(stats_df) <- NULL
 print(stats_df)
@@ -129,6 +129,9 @@ lm_stats <- lapply(alpha_metrics, function(metric) {
 
 lm_stats_df <- do.call(rbind, lm_stats)
 
+lm_stats_df$FDR_p_value <- p.adjust(lm_stats_df$p_value, method = "fdr")
+
+print(lm_stats)
 # Find significant relationships
 
 for (predictor in predictors) {
@@ -156,16 +159,16 @@ stats_df$FDR_p_value <- p.adjust(stats_df$p_val_raw, method = "fdr")
 
 # clean up the table 
 stats_df <- stats_df %>%
-  select(-c(p_val_raw....p_val))
+  dplyr::select(-c(p_val_raw....p_val))
 
 rownames(stats_df) <- NULL
 print(stats_df)
 
 # pivot longer for plotting
 plot_data <- alpha_diversity %>%
-  select(habitual_b12_norm, all_of(alpha_metrics)) %>%
-  pivot_longer(cols = all_of(alpha_metrics), names_to = "Metric", values_to = "Value") %>%
-  mutate(Metric = as.character(Metric))
+  dplyr::select(habitual_b12_norm, all_of(alpha_metrics)) %>%
+  tidyr::pivot_longer(cols = all_of(alpha_metrics), names_to = "Metric", values_to = "Value") %>%
+  dplyr::mutate(Metric = as.character(Metric))
 
 # scatter plots 
 ggplot(plot_data, aes(x = habitual_b12_norm, y = Value)) +
@@ -204,4 +207,8 @@ stats_table <- plot_data %>%
   ungroup()
 
 print(stats_table)
+
+# FDR correction 
+stats_table$FDR_p_value <- p.adjust(stats_table$p_value, method = "fdr")
+
 #write.csv(stats_table, "linear_alpha_summary.csv", row.names = FALSE

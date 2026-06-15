@@ -39,10 +39,10 @@ print(bestNormalize::bestNormalize(data$habitual_dietary_b12, allow_orderNorm = 
 data$normalized_resp <- bestNormalize::bestNormalize(data$plasma_b12, allow_orderNorm = F, k = 10, r = 10)$x.t
 data$normalized_pred <- bestNormalize::bestNormalize(data$habitual_dietary_b12, allow_orderNorm = F, k = 10, r = 10)$x.t
 
-# multiple linear regression with normalized response, predicting plasma B12 from covariates 
+# Multiple linear regression with normalized response, predicting plasma B12 from covariates 
 model <- lm(normalized_resp ~ as.numeric(bmi) + as.numeric(age) + as.factor(sex), data = data)
 
-# partial regression plot 
+# Partial regression plot 
 partial_regression <- car::avPlots(model, main = paste(data$plasma_b12, "vs. Anthro")) # the variables don't look particularly explanatory 
 
 car::dfbetaPlots(model = model)
@@ -73,7 +73,8 @@ tmp_outer <- rbind(tmp_outer, tmp_inner_bmi, tmp_inner_age, tmp_inner_sex)
 print(df_anthro)
 
 # ---- Supplementary Figure 1A-C: Plot partial correlations ----
-# age panel 
+
+# Age panel 
 plot1 <- ggplot(subset(tmp_outer, tmp_outer$predictor_name == "age")) + 
   aes(x = normalized_pred, y = normalized_resp, fill = "#969696") + 
   geom_point(aes(fill = response_name), pch=21, colour="black", alpha = 0.5, size=1.5) +
@@ -88,7 +89,7 @@ plot1 <- ggplot(subset(tmp_outer, tmp_outer$predictor_name == "age")) +
 
 plot1
 
-# bmi panel  
+# BMI panel  
 plot2 <- ggplot(subset(tmp_outer, tmp_outer$predictor_name == "bmi")) + 
   aes(x = normalized_pred, y = normalized_resp) + 
   geom_point(aes(fill = response_name), pch=21, colour="black", alpha = 0.5, size= 1.5) +
@@ -104,12 +105,13 @@ plot2 <- ggplot(subset(tmp_outer, tmp_outer$predictor_name == "bmi")) +
 
 plot2
 
-# customize the dataframe for box plots 
+# Customize the data frame for box plots 
 boxplot_dat <- tmp_outer %>% dplyr::filter(., predictor_name == "sex") %>%
   dplyr::mutate(., sex_factor = ifelse(as.numeric(normalized_pred) > 0, "Male", "Female"))
 boxplot_dat$sex_factor <- factor(boxplot_dat$sex_factor,
                                  levels = c('Male','Female'), ordered = TRUE)
-# look for significant differences in plasma B12 between the sexes 
+
+# Look for significant differences in plasma B12 between the sexes 
 rstatix::t_test(normalized_resp ~ sex_factor, data = boxplot_dat)
 
 stat.test <- boxplot_dat %>%
@@ -118,7 +120,10 @@ stat.test <- boxplot_dat %>%
   rstatix::add_significance() %>%
   rstatix::add_xy_position()
 
-# sex panel 
+stat.test$y.position
+stat.test$y.position <- 3.2
+
+# Sex panel 
 plot3 <- boxplot_dat %>%
   ggplot(aes(x = sex_factor, y = normalized_resp)) + 
   geom_boxplot(aes(fill = sex_factor), outliers = FALSE) + 
@@ -154,25 +159,33 @@ table <- model %>%
                               `as.numeric(age)` ~ "Age (years)",
                               `as.factor(sex)` ~ "Sex"))
 
-# extract the p-value for plotting
+# Extract the p-value for plotting
 p_value <- table$table_body$p.value[1]
 
-# table to kable
+# Table to kable
 ktable <- table %>%
   gtsummary::as_kable() %>%
   kableExtra::kable_styling(font_size = 24) %>%
   kableExtra::column_spec(2, latex_column_spec = "input")  # adjust column for superscript
 
-# make stylistic adjustments using HTML
+# Make stylistic adjustments using HTML
 ktable <- gsub("kg/m2", "kg/m<sup>2</sup>", ktable)
 ktable <- gsub("Habitual dietary B12", "Habitual dietary B<sub>12</sub> (<span style='font-size:14px;'>&micro;g/d</span>)", ktable)
 ktable <- gsub("\\*\\*(.*?)\\*\\*", "\\1", ktable)
 
-# save the table
+# Save the table
 ktable %>%
   kableExtra::save_kable('fig1_table.png')
 
-## plot the partial regression 
+#install.packages("magick")
+library(magick)
+
+# Saving as an image object so I can use in a patchwork object 
+table_img <- ggplot() + 
+  background_image(image_read("fig1_table.png")) +
+  theme_void()
+
+# Plot the partial regression 
 plot4 <- ggplot(as.data.frame(partial_regression$normalized_pred)) + 
   #aes(x = normalized_pred, y = normalized_resp, fill = "#969696") + 
   aes(x = normalized_pred, y = normalized_resp) + 
@@ -183,21 +196,29 @@ plot4 <- ggplot(as.data.frame(partial_regression$normalized_pred)) +
   theme_bw(base_size = 16) + 
   theme(panel.grid.minor = element_blank(), axis.text = element_text(colour = "black")) +
   labs(x = expression(Habitual~~B[12]~intake~"(normalized) | covariates")) +
-  labs(y = expression(Plasma~vitamin~B[12]~"(normalized) | covariates"))+ 
+  labs(y = expression(Plasma~vitamin~B[12]~"(normalized) | covariates")) + 
   guides(color="none", fill = "none") +
   coord_cartesian(ylim = c(-3,3.25)) +
   annotate("text",
     x = 0.8,
     y = 3.4,
     hjust = 0, vjust = 1,
-    label = "Adj. R\u00B2 = 0.18\nbeta coef. = 0.42\np < 0.001",
+    label = "Adj. R\u00B2 = 0.18\nbeta coef. = 0.41\np < 0.001",
     size = 4,
     color = "red")
 
+## replace the beta coef. and p-values manually (bc i'm lazy)
 
 plot4 # FYI: this object ends up in the multi-panel Figure 1
 
 # --- Design multi-panel figure ----
 
 pw_plot <- plot1 + plot2 + plot3
+
 pw_plot
+
+(plot1 + plot2) /
+  (plot3 + table_img) + 
+  plot_annotation(tag_levels = 'A')  
+
+# ggsave("figures/supp_corr_plot.pdf", height = 6, width = 9)

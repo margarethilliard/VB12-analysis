@@ -1,5 +1,6 @@
 
 # ---- Setup ----
+
 set.seed(8675309)
 
 #install.packages(c("dplyr", "ggplot2", "rstatix", "ggpubr", "ggbreak", "patchwork", "scales"))
@@ -17,11 +18,13 @@ library(scales)
 setwd("/Users/local-margaret/Desktop/VB12-analysis")
 source("scripts/get_data.R")
 
+# Subset of data with plasma B12 and metagenomes 
 data <- metadata_sub
 
-# ---- Figure 1A-B: Compare intake and plasma B12 status between supplement users/non-users ----
+# ---- Compare intake and plasma B12 status between supplement users/non-users ----
+
 data_users <- data %>%
-  filter(supplement_taker == "Yes") 
+  dplyr::filter(supplement_taker == "Yes") 
 
 data_users %>%
   dplyr::summarise(mean = mean(habitual_dietary_b12))
@@ -98,7 +101,7 @@ panel_b <- ggplot(data, aes(x=supplement_taker, y=habitual_dietary_b12, colour =
 
 panel_b
 
-# ---- Figure 1C-D: Compare intake and plasma B12 status between the high/low intake groups ----
+# ---- Compare intake and plasma B12 status between the high/low intake groups ----
 data_high <- data %>%
   filter(intake_group == "High") 
 
@@ -131,8 +134,8 @@ panel_c <- ggplot(data, aes(x=intake_group, y=plasma_b12, colour = intake_group)
                shape = 18, size = 3, colour = "black", 
                position = position_dodge(width = 0.75)) +
   scale_colour_manual(values = c("#969696", "#e24f4a")) +
-  scale_x_discrete(labels = c("Low"  = "Low (< 8.16 \u00B5g/d)",
-                              "High" = "High (> 8.16 \u00B5g/d)")) +
+  scale_x_discrete(labels = c("Low"  = "Adequate",
+                              "High" = "High")) +
   theme_bw(base_size = 16) + 
   geom_hline(aes(yintercept = 148), colour="black", linetype="dashed", size = 1.25) + # replete range 
   geom_hline(aes(yintercept = 300), colour="black", linetype="dashed", size = 1.25) + 
@@ -141,8 +144,8 @@ panel_c <- ggplot(data, aes(x=intake_group, y=plasma_b12, colour = intake_group)
   scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
   theme(panel.border = element_rect(colour = "black", fill=NA),
         legend.position = "none",
-        axis.text = element_text(colour = "black"),
-        axis.text.x = element_text(size = 11)) +
+        axis.text = element_text(colour = "black")) +
+        #axis.text.x = element_text(size = 11)) +
   labs(x = expression(B[12] ~ "intake group"),
        y = expression(Plasma~vitamin~B[12]~", pmol/L"))
 
@@ -163,8 +166,8 @@ panel_d <- ggplot(data, aes(x=intake_group, y=habitual_dietary_b12, colour = int
                shape = 18, size = 3, colour = "black", 
                position = position_dodge(width = 0.75)) +
   scale_colour_manual(values = c("#969696", "#e24f4a")) +
-  scale_x_discrete(labels = c("Low"  = "Low (< 8.16 \u00B5g/d)",
-                              "High" = "High (> 8.16 \u00B5g/d)")) +
+  scale_x_discrete(labels = c("Low"  = "Adequate\n(2.4–8.51 \u00B5g/d)",
+                              "High" = "High\n(> 8.51 \u00B5g/d)")) +
   theme_bw(base_size = 16) + 
   geom_hline(aes(yintercept = 2.4), colour="black", linetype="dashed", size = 1.25) +
   ggpubr::stat_pvalue_manual(stat.test, label = "p.signif", y.position = 900, vjust = 0.3,
@@ -189,19 +192,15 @@ panel_d
 
 # ---- Design multi-panel plot ---- 
 
-# Note: plot4 object is generated from another script called "partial_correlations.R"
-((panel_c + panel_d) / (panel_a + panel_b) | (plot4) ) + 
+# FIGURE 1 -- Note that the venn_diagrams and sorted_bars are from other scripts called "venn_diagram.R" and "sorted_bars.R" 
+
+(sorted_bars | (panel_d + panel_b) / venn_diagrams) + 
   patchwork::plot_annotation(tag_levels = 'A')
 
-# Note: venn_diagrams is generated from another script called "venn_diagram.R"
-(panel_d + panel_b) / (venn_diagrams) + 
-  patchwork::plot_annotation(tag_levels = 'A')
+#ggsave("figures/FIGURE1_revision.pdf", height = 9, width = 18)
 
-#ggsave("figures/boxplots_v4.pdf", height = 10, width =18)
-ggsave("figures/boxplots_v4.pdf", height = 8, width = 10)
-
+# FIGURE 2 -- Note that the plot4 object is generated from another script called "partial_correlations.R"
 (panel_c + panel_a) / (plot4) + 
   patchwork::plot_annotation(tag_levels = 'A')
 
-ggsave("figures/boxplots_v5.pdf", height = 8, width = 10)
-
+#ggsave("figures/FIGURE2_revision.pdf", height = 8, width = 10)

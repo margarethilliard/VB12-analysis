@@ -21,7 +21,7 @@ source("scripts/get_data.R")
 # ---- Read in pathway completion data from anvio-estimate-metabolism ---- 
 # Read in the module completness result file 
 res <- readr::read_delim("data/B12_biosynth-module_pathwise_completeness-MATRIX.txt") %>%
-  select(-c("module", "module_name", "module_class", "module_category", "module_subcategory"))
+  dplyr::select(-c("module", "module_name", "module_class", "module_category", "module_subcategory"))
 
 # Tidy up the data frame and add a subject_id identifier to merge on 
 res <- res %>%
@@ -40,9 +40,9 @@ data$pathwise_completion <- as.numeric(data$pathwise_completion)
 
 # ---- Data wrangling ---- 
 # Total number of medium-quality draft MAGs per subject ID 
-MAG_n <- readr::read_delim("/Users/local-margaret/Downloads/external_genomes_v2.txt") %>% 
+MAG_n <- readr::read_delim("/Users/local-margaret/Desktop/VB12-analysis/data/external_genomes_v2.txt") %>% 
   tidyr::separate(name, into = c("MAG", "subject_id", "number"), sep = "_") %>%
-  select(subject_id, number) %>%
+  dplyr::select(subject_id, number) %>%
   group_by(subject_id) %>%
   summarise(n_MAGs = n())
 
@@ -52,12 +52,15 @@ complete_b12 <- data %>%
   #dplyr::filter(pathwise_completion == 1) %>%
   group_by(subject_id) %>%
   mutate(n_complete_b12 = n()) %>%
-  select(subject_id, n_complete_b12, intake_group, supplement_taker) %>%
+  dplyr::select(subject_id, n_complete_b12, intake_group, supplement_taker) %>%
   ungroup() %>%
   distinct()
 
 data_merged <- left_join(complete_b12, MAG_n) %>%
   mutate(prop_complete_b12 = n_complete_b12/n_MAGs)
+
+mean(data_merged$n_MAGs)
+median(data_merged$n_MAGs)
 
 # ---- Plot 2A: differences in the proportion of MAGs with complete B12 synthesis pathway based on B12 intake group ---- 
 stat.test_res <-  rstatix::wilcox_test(prop_complete_b12 ~ intake_group, data = data_merged) %>%
@@ -83,9 +86,9 @@ plot_A <- data_merged %>%
   labs(x = expression(B[12] ~ "intake group"),
        y = expression(atop("Proportion of total MAGs with complete", 
                            B[12] ~ " synthesis pathway"))) +
-  scale_x_discrete(labels = c("Low"  = "Low (< 8.16 \u00B5g/d)",
-                              "High" = "High (> 8.16 \u00B5g/d)")) +
-  theme_bw(base_size = 12) +
+  scale_x_discrete(labels = c("Low"  = "Adequate",
+                              "High" = "High")) +
+  theme_bw(base_size = 16) +
   theme(legend.position = "none",
         axis.text.x = element_text(color = "black")) +
   scale_y_continuous(breaks = seq(0, 1, by = 0.2)) + 
@@ -117,7 +120,7 @@ plot_B <- data_merged %>%
   labs(x = expression(B[12] ~ "supplement use"),
        y = expression(atop("Proportion of total MAGs with complete", 
                            B[12] ~ " synthesis pathway"))) +
-  theme_bw(base_size = 12) +
+  theme_bw(base_size = 16) +
   theme(legend.position = "none",
         axis.text.x = element_text(color = "black")) +
   scale_y_continuous(breaks = seq(0, 1, by = 0.2)) + 
@@ -130,4 +133,4 @@ plot_B
 plot_A + plot_B +
   plot_annotation(tag_levels = "A")
 
-#ggsave("figures/MAGs_Patchwork.pdf", width = 8, height = 5)
+# ggsave("figures/FIGURE3_revisions.pdf", width = 8, height = 5)

@@ -22,20 +22,30 @@ library(performance)
 setwd("/Users/local-margaret/Desktop/VB12-analysis")
 source("scripts/get_data.R")
 
-# ----- SCFA GLMs ----- 
 metadata_sub$sex <- as.factor(metadata_sub$sex)
 
 data <- left_join(metadata_sub, scfa, by = "subject_id") %>%
   na.exclude()
 
+# ---- Reviewer suggests doing a more rudamentary test of associations before GLM ----
+wilcox.test(acetate ~ intake_group, data=data) 
+wilcox.test(propionate ~ intake_group, data=data)
+wilcox.test(new_butyrate ~ intake_group, data=data)
+
+wilcox.test(acetate ~ supplement_taker, data=data)
+wilcox.test(propionate ~ supplement_taker, data=data)
+wilcox.test(new_butyrate ~ supplement_taker, data=data)
+
+# ----- SCFA GLMs ----- 
+
 # Define response–predictor pairs
 model_pairs <- tibble::tibble(
-  response = c("acetate", "acetate","acetate", 
-               "propionate", "propionate", "propionate", 
-               "new_butyrate", "new_butyrate","new_butyrate"),
-  predictor = c("habitual_dietary_b12", "supplement_taker", "intake_group", 
-                "habitual_dietary_b12", "supplement_taker", "intake_group", 
-                "habitual_dietary_b12", "supplement_taker", "intake_group"))
+  response = c("acetate","acetate", 
+               "propionate", "propionate", 
+               "new_butyrate","new_butyrate"),
+  predictor = c("supplement_taker", "intake_group", 
+                "supplement_taker", "intake_group", 
+                "supplement_taker", "intake_group"))
 
 # Define reference groups for clear interpretation 
 data$intake_group <- as.factor(data$intake_group)
@@ -44,7 +54,7 @@ data$intake_group <- relevel(data$intake_group, ref = "Low") # low = 1, high = 2
 data$supplement_taker <- as.factor(data$supplement_taker)
 data$supplement_taker <- relevel(data$supplement_taker, ref = "No") # No = 1, Yes = 2 
 
-# Function to fit GLM adjusted for proper co-variate, extract results, check residuals and dispersion of simulated data 
+# Function to fit GLM adjusted for proper co-variates, extract results, check residuals and dispersion of simulated data 
 fit_glm_with_dharma <- function(response, predictor, data) {
   formula <- as.formula(paste(response, "~", predictor, "+ age + sex + bmi + dt_fiber_sol + dietary_methionine"))
   model <- glm(formula, family = Gamma(link = "log"), data = data)
@@ -85,12 +95,18 @@ fit_glm_with_dharma <- function(response, predictor, data) {
 # Run models for all pairs and combine results
 all_results <- pmap_dfr(list(model_pairs$response, model_pairs$predictor), fit_glm_with_dharma, data = data)
 
+# Ignore significant associations with co-variates for now 
+all_results_main <- all_results %>% 
+  filter(term == "intake_groupHigh" | term == "supplement_takerYes" | term == "habitual_dietary_b12")
+
+print(all_results_main)
+
 # Adjust p-values for multiple comparisons 
-all_results <- all_results %>%
+all_results_main <- all_results_main %>%
   mutate(p_value_adj = p.adjust(p_value, method = "fdr"), .after = p_value)
 
 # View significant results
-all_results <- all_results %>%
+all_results_main <- all_results_main %>%
   filter(p_value_adj < 0.05) %>%
   mutate(
     # log-scale coefficient from GLM to a multiplicative effect confidence interval
@@ -100,12 +116,6 @@ all_results <- all_results %>%
     percent_CI_lower = (multiplicative_CI_lower - 1) * 100,
     percent_CI_upper = (multiplicative_CI_upper - 1) * 100,
     label = paste(response, predictor, sep = " ~ "))
-
-print(all_results)
-
-# Ignore significant associations with co-variates for now 
-all_results_main <- all_results %>% 
-  filter(term == "intake_groupHigh" | term == "supplement_takerYes" | term == "habitual_dietary_b12")
 
 print(all_results_main)
 
@@ -121,76 +131,79 @@ ggplot(all_results_main, aes(x = percent_change, y = reorder(label, percent_chan
 
 # ---- Estimated marginal means (EMMs) of categorical predictors ----
 model_pairs <- tibble::tibble(
-  response = c("acetate", "acetate",
+  response_var = c("acetate", "acetate",
                "propionate", "propionate", 
                "new_butyrate", "new_butyrate"),
   predictor = c("supplement_taker", "intake_group",
                 "supplement_taker", "intake_group",
                 "supplement_taker", "intake_group"))
 
-get_emm_df <- function(response, predictor, data) {
+get_emm_df <- function(response_var, predictor, data) {
   # build models
-  formula <- as.formula(paste(response, "~", predictor, "+ age + sex + bmi + dt_fiber_sol + dietary_methionine"))
-  model <- glm(formula, family = Gamma(link = "log"), data = data)
+  model_formula <- as.formula(paste(response_var, "~", predictor, "+ age + sex + bmi + dt_fiber_sol + dietary_methionine"))
+  model <- glm(model_formula, family = Gamma(link = "log"), data = data)
   
-  # get EMMs and back-transform the response variable 
-  emm <- emmeans(model, specs = predictor, type = "response")
+  # get EMMs and back-transform the response variable
+  emm <- emmeans(model, specs = as.formula(paste("~", predictor)), type = "response")
   
   # EMM results to tidy format
   emm_df <- as.data.frame(emm) %>%
     rename(predicted = response) %>%
-    mutate(response_var = response,
+    mutate(response_var = response_var,
            predictor_var = predictor,
            predictor_level = .data[[predictor]]) %>%
-    select(response_var, predictor_var, predictor_level,
+    dplyr::select(response_var, predictor_var, predictor_level,
            predicted, SE, df, lower.CL, upper.CL)
   
-  # Pairwise contrasts
-  contrast_obj <- emmeans::contrast(emm, method = "pairwise")
+  # Pairwise contrasts, over writing the default multiple comparison method 
+  contrast_obj <- emmeans::contrast(emm, method = "pairwise", adjust = "none")
   contrast_df <- as.data.frame(contrast_obj)
   
-  # Add confidence intervals
-  ci_df <- as.data.frame(confint(contrast_obj))
+  # Add confidence intervals on the response scale
+  ci_df <- as.data.frame(confint(contrast_obj, type = "response")) %>%
+    rename_with(~ "lower.CL", matches("LCL|lower.CL")) %>%
+    rename_with(~ "upper.CL", matches("UCL|upper.CL"))
   
   # Merge estimates and CIs
-  contrast_df <- left_join(contrast_df, ci_df %>% select(contrast, lower.CL, upper.CL),
+  contrast_df <- left_join(contrast_df, ci_df %>% 
+                             dplyr::select(contrast, lower.CL, upper.CL),
                            by = "contrast") %>%
-    mutate(response_var = response,
+    dplyr::mutate(response_var = response_var,
            predictor_var = predictor) %>%
-    select(response_var, predictor_var, contrast, ratio, SE, df, lower.CL, upper.CL, p.value)
+    dplyr::select(response_var, predictor_var, contrast, ratio, SE, df, lower.CL, upper.CL, p.value)
   
-  # Return a list with both EMMs and contrasts
   return(list(emm = emm_df, contrasts = contrast_df))
 }
 
 # Loop through all models
-emm_all <- pmap(list(model_pairs$response, model_pairs$predictor),
+emm_all <- pmap(list(model_pairs$response_var, model_pairs$predictor),
                 get_emm_df,
                 data = data)
 
 # Extract results separately 
 emm_results <- bind_rows(map(emm_all, "emm")) 
 
-# Do multiple test correction for contrasts 
+# Do multiple test correction on the pairwise contrasts 
+# The default tukey adjustment will make no difference (since there are only two groups)
 contrast_results <- bind_rows(map(emm_all, "contrasts")) %>%
   mutate(p.adj = p.adjust(p.value, method = "fdr")) 
 
 sig_labels_supps <- contrast_results %>%
-  filter(predictor_var == "supplement_taker") %>%
+    filter(predictor_var == "supplement_taker") %>%
   # Split the contrast into group1 and group2
   mutate(group1 = sapply(str_split(as.character(contrast), " / "), `[`, 1),
          group2 = sapply(str_split(as.character(contrast), " / "), `[`, 2),
          # Re-code significance stars
          label = case_when(
-           p.adj < 0.001 ~ "***",
+          p.adj < 0.001 ~ "***",
            p.adj < 0.01  ~ "**",
            p.adj < 0.05  ~ "*",
            TRUE ~ "ns")) %>%
   group_by(response_var) %>%
   # Set y.position slightly above the max predicted value for each facet
-  mutate(y.position = max(emm_results$predicted[emm_results$response_var == unique(response_var)]) * 1.15) %>%
+  mutate(y.position = max(emm_results$predicted[emm_results$response_var == unique(response_var)]) * 2.25) %>%
   ungroup() %>%
-  select(response_var, group1, group2, y.position, p.adj, label) %>%
+  dplyr::select(response_var, group1, group2, y.position, p.adj, label) %>%
   dplyr::mutate(response_var = dplyr::recode(response_var, 
                                              "acetate" = "Acetate",
                                              "propionate" = "Propionate", 
@@ -209,9 +222,9 @@ sig_labels_intake <- contrast_results %>%
            TRUE ~ "ns")) %>%
   group_by(response_var) %>%
   # Set y.position slightly above the max predicted value for each facet
-  mutate(y.position = max(emm_results$predicted[emm_results$response_var == unique(response_var)]) * 1.15) %>%
+  mutate(y.position = max(emm_results$predicted[emm_results$response_var == unique(response_var)]) * 2.25) %>%
   ungroup() %>%
-  select(response_var, group1, group2, y.position, p.adj, label) %>%
+  dplyr::select(response_var, group1, group2, y.position, p.adj, label) %>%
   dplyr::mutate(response_var = dplyr::recode(response_var, "acetate" = "Acetate",
                                              "propionate" = "Propionate", 
                                              "new_butyrate" =  "Butyrate"))
@@ -236,17 +249,140 @@ plot_1 <- emm_results %>%
   theme(legend.position = "none",
         strip.text = element_text(size = 12), # "strip" = facet wrap label 
         strip.background = element_blank(),
+        axis.text.x = element_text(color = "black")) 
+  #ggpubr::stat_pvalue_manual(sig_labels_supps,
+  #                           label = "label",
+  #                           xmin = "group1",
+  #                           xmax = "group2",
+  #                           y.position = "y.position")
+
+plot_1
+
+# get raw values to plot as an overlay (to show the distribution as per reviewer comment)
+raw_long <- data %>%
+  tidyr::pivot_longer(cols = c(acetate, propionate, new_butyrate),
+                      names_to = "response_var",
+                      values_to = "value") %>%
+  dplyr::mutate(response_var = dplyr::recode(response_var,
+                                             "acetate" = "Acetate",
+                                             "propionate" = "Propionate",
+                                             "new_butyrate" = "Butyrate"))
+plot_1_with_jitter <- plot_1 +
+  geom_jitter(data = raw_long,
+              aes(x = supplement_taker, y = value, fill = supplement_taker),
+              width = 0.15, height = 0,
+              shape = 21,
+              color = "black",
+              stroke = 0.3,
+              size = 1.5, alpha = 0.25,
+              inherit.aes = FALSE) +
+  scale_fill_manual(values = c("#969696", "#e24f4a"))
+  
+plot_1_with_jitter
+
+
+# ----- Trying the boxplot with EMM overlayed -----
+y_positions <- raw_long %>%
+  dplyr::group_by(response_var) %>%
+  dplyr::summarise(max_val = max(value, na.rm = TRUE)) %>%
+  dplyr::mutate(y.position = max_val * 1.05)  # 5% above the max value
+
+# join back to sig_labels_supps
+sig_labels_supps <- sig_labels_supps %>%
+  dplyr::left_join(y_positions, by = "response_var")
+
+plot_1_with_EMM_overlay <- ggplot() +
+  # Layer 1: boxplot of raw data
+  geom_boxplot(data = raw_long,
+               aes(x = supplement_taker, y = value, fill = supplement_taker),
+               width = 0.6, color = "black",
+               outlier.shape = 21,
+               outlier.fill = "white") +
+  # Layer 2: EMM point estimate
+  geom_point(data = emm_results %>%
+               dplyr::filter(predictor_var == "supplement_taker") %>%
+               dplyr::mutate(response_var = dplyr::recode(response_var,
+                                                          "acetate" = "Acetate",
+                                                          "propionate" = "Propionate",
+                                                          "new_butyrate" = "Butyrate")),
+             aes(x = predictor_level, y = predicted),
+             shape = 23, fill = "white", color = "black",
+             size = 3) +
+  # Layer 3: EMM 95% CI
+  geom_errorbar(data = emm_results %>%
+                  dplyr::filter(predictor_var == "supplement_taker") %>%
+                  dplyr::mutate(response_var = dplyr::recode(response_var,
+                                                             "acetate" = "Acetate",
+                                                             "propionate" = "Propionate",
+                                                             "new_butyrate" = "Butyrate")),
+                aes(x = predictor_level, ymin = lower.CL, ymax = upper.CL),
+                width = 0.15, linewidth = 0.6) +
+  facet_wrap(~response_var, scales = "free_y") +
+  scale_fill_manual(values = c("#969696", "#e24f4a")) +
+  labs(x = expression(B[12] ~ "supplement use"),
+       y = "SCFA concentration, nmol/mg") +
+  theme_bw(base_size = 12) +
+  theme(legend.position = "none",
+        strip.text = element_text(size = 12),
+        strip.background = element_blank(),
         axis.text.x = element_text(color = "black")) +
   ggpubr::stat_pvalue_manual(sig_labels_supps,
                              label = "label",
                              xmin = "group1",
                              xmax = "group2",
-                             y.position = "y.position")
+                             y.position = "y.position.y")
 
-plot_1
+plot_1_with_EMM_overlay <- ggplot() +
+  # Layer 1: boxplot of raw data
+  geom_boxplot(data = raw_long,
+               aes(x = supplement_taker, y = value, colour = supplement_taker),
+               fill = "white",
+               width = 0.5,
+               outliers = FALSE) +
+  # Layer 2: jittered raw points
+  geom_jitter(data = raw_long,
+              aes(x = supplement_taker, y = value, colour = supplement_taker),
+              shape = 16,
+              position = position_jitter(width = 0.15, height = 0),
+              alpha = 0.75) +
+  # Layer 3: EMM point estimate
+  geom_point(data = emm_results %>%
+               dplyr::filter(predictor_var == "supplement_taker") %>%
+               dplyr::mutate(response_var = dplyr::recode(response_var,
+                                                          "acetate" = "Acetate",
+                                                          "propionate" = "Propionate",
+                                                          "new_butyrate" = "Butyrate")),
+             aes(x = predictor_level, y = predicted),
+             shape = 18, fill = "black", color = "black",
+             size = 3) +
+  # Layer 4: EMM 95% CI
+  geom_errorbar(data = emm_results %>%
+                  dplyr::filter(predictor_var == "supplement_taker") %>%
+                  dplyr::mutate(response_var = dplyr::recode(response_var,
+                                                             "acetate" = "Acetate",
+                                                             "propionate" = "Propionate",
+                                                             "new_butyrate" = "Butyrate")),
+                aes(x = predictor_level, ymin = lower.CL, ymax = upper.CL),
+                width = 0, linewidth = 0.6) +
+  facet_wrap(~response_var, scales = "free_y") +
+  scale_colour_manual(values = c("#969696", "#e24f4a")) +
+  labs(x = expression(B[12] ~ "supplement use"),
+       y = "SCFA concentration, nmol/mg") +
+  theme_bw(base_size = 16) +
+  theme(legend.position = "none",
+        strip.text = element_text(size = 12),
+        strip.background = element_blank(),
+        axis.text = element_text(color = "black")) +
+        #axis.text.x = element_text(size = 10)) +
+  ggpubr::stat_pvalue_manual(sig_labels_supps,
+                             label = "label",
+                             xmin = "group1",
+                             xmax = "group2",
+                             y.position = "y.position.y")
 
-#ggsave("figures/EMM_SCFA_supp_use.pdf", width = 8, height = 3)
+plot_1_with_EMM_overlay
 
+# ----- Intake plots ----- 
 plot_2 <- emm_results %>%
   dplyr::filter(predictor_var == "intake_group") %>%
   dplyr::mutate(response_var = dplyr::recode(response_var, "acetate" = "Acetate",
@@ -262,25 +398,102 @@ plot_2 <- emm_results %>%
   scale_fill_manual(values = c("#969696", "#e24f4a")) +
   labs(x = expression(B[12] ~ "intake group"),
        y = "SCFA concentration, nmol/mg\n(adjusted for covariates)") +
-  scale_x_discrete(labels = c("Low"  = "Low (< 8.16 \u00B5g/d)",
-                              "High" = "High (> 8.16 \u00B5g/d)")) +
+  scale_x_discrete(labels = c("Low"  = "Adequate",
+                              "High" = "High")) +
   theme_bw(base_size = 12) +
   theme(legend.position = "none",
         strip.text = element_text(size = 12),
         strip.background = element_blank(),
         axis.text.x = element_text(color = "black",
-                                   size = 8)) +
+                                   size = 8)) 
+  #ggpubr::stat_pvalue_manual(sig_labels_intake,
+   #                          label = "label",
+   #                          xmin = "group1",
+   #                          xmax = "group2",
+   #                          y.position = "y.position")
+
+
+plot_2
+
+plot_2_with_jitter <- plot_2 +
+  geom_jitter(data = raw_long,
+              aes(x = intake_group, y = value, fill = intake_group),
+              width = 0.15, height = 0,
+              shape = 21,
+              color = "black",
+              stroke = 0.3,
+              size = 1.5, alpha = 0.25,
+              inherit.aes = FALSE) +
+  scale_fill_manual(values = c("#969696", "#e24f4a"))
+
+plot_2_with_jitter
+
+# boxplot with EMM overlay 
+y_positions <- raw_long %>%
+  dplyr::group_by(response_var) %>%
+  dplyr::summarise(max_val = max(value, na.rm = TRUE)) %>%
+  dplyr::mutate(y.position = max_val * 1.05)  # 5% above the max value
+
+# join back to sig_labels_supps
+sig_labels_intake <- sig_labels_intake %>%
+  dplyr::left_join(y_positions, by = "response_var")
+
+plot_2_with_EMM_overlay <- ggplot() +
+  # Layer 1: boxplot of raw data
+  geom_boxplot(data = raw_long,
+               aes(x = intake_group, y = value, colour = intake_group),
+               fill = "white",
+               width = 0.5,
+               outliers = FALSE) +
+  # Layer 2: jittered raw points
+  geom_jitter(data = raw_long,
+              aes(x = intake_group, y = value, colour = intake_group),
+              shape = 16,
+              position = position_jitter(width = 0.15, height = 0),
+              alpha = 0.75) +
+  # Layer 3: EMM point estimate
+  geom_point(data = emm_results %>%
+               dplyr::filter(predictor_var == "intake_group") %>%
+               dplyr::mutate(response_var = dplyr::recode(response_var,
+                                                          "acetate" = "Acetate",
+                                                          "propionate" = "Propionate",
+                                                          "new_butyrate" = "Butyrate")),
+             aes(x = predictor_level, y = predicted),
+             shape = 18, fill = "black", color = "black",
+             size = 3) +
+  # Layer 4: EMM 95% CI
+  geom_errorbar(data = emm_results %>%
+                  dplyr::filter(predictor_var == "intake_group") %>%
+                  dplyr::mutate(response_var = dplyr::recode(response_var,
+                                                             "acetate" = "Acetate",
+                                                             "propionate" = "Propionate",
+                                                             "new_butyrate" = "Butyrate")),
+                aes(x = predictor_level, ymin = lower.CL, ymax = upper.CL),
+                width = 0, linewidth = 0.6) +
+  facet_wrap(~response_var, scales = "free_y") +
+  scale_colour_manual(values = c("#969696", "#e24f4a")) +
+  labs(x = expression(B[12] ~ "intake group"),
+       y = "SCFA concentration, nmol/mg") +
+  scale_x_discrete(labels = c("Low"  = "Adequate",
+                              "High" = "High")) +
+  theme_bw(base_size = 16) +
+  theme(legend.position = "none",
+        strip.text = element_text(size = 12),
+        strip.background = element_blank(),
+        axis.text = element_text(color = "black")) +
   ggpubr::stat_pvalue_manual(sig_labels_intake,
                              label = "label",
                              xmin = "group1",
                              xmax = "group2",
-                             y.position = "y.position")
+                             y.position = "y.position.y")
 
-plot_2
+plot_2_with_EMM_overlay
 
 # ---- Design multi-panel plot ----
-plot_2 / plot_1+
+plot_2_with_EMM_overlay / plot_1_with_EMM_overlay +
   plot_annotation(tag_levels = 'A')
+
+# ggsave("figures/FIGURE4_as_boxplots.pdf", width = 8, height = 9)
 
 # ---- Dose response using estimated marginal slopes ----
 metadata_sub$sex <- as.factor(metadata_sub$sex)
@@ -311,18 +524,18 @@ get_trend_df <- function(response, predictor, data) {
   
   # Convert to data frame
   trends_df <- as.data.frame(trends) %>%
-    rename(slope = habitual_b12_norm.trend,
+    dplyr::rename(slope = habitual_b12_norm.trend,
            slope_SE = SE,
            slope_df = df,
            slope_lower.CL = lower.CL,
            slope_upper.CL = upper.CL) %>%
-    mutate(response_var = response,
+    dplyr::mutate(response_var = response,
            predictor_var = predictor,
            # exponentiate for interpretation as multiplicative effect per ΔX:
            ratio_per_unit = exp(slope),
            ratio_lower.CL = exp(slope_lower.CL),
            ratio_upper.CL = exp(slope_upper.CL)) %>%
-    select(response_var, predictor_var,
+    dplyr::select(response_var, predictor_var,
            slope, slope_SE, slope_df, slope_lower.CL, slope_upper.CL,
            ratio_per_unit, ratio_lower.CL, ratio_upper.CL)
   
@@ -334,7 +547,7 @@ trend_results <- pmap_dfr(list(model_pairs$response, model_pairs$predictor),
                           get_trend_df,
                           data = data)
 
-# ---- 3. Wald two-tailed z-test to compute p-values, and FDR correction for slopes, if necessary ----
+# ---- 3. Wald two-tailed z-test to compute p-values, and FDR correction for slopes ----
 trend_results <- trend_results %>%
   mutate(p.value = 2 * pnorm(abs(slope / slope_SE), lower.tail = FALSE))
 # null hypothesis is that slope = 0
@@ -343,7 +556,7 @@ trend_results <- trend_results %>%
 trend_results
 
 trend_results %>%
-  select(response_var, predictor_var,
+  dplyr::select(response_var, predictor_var,
          slope, slope_SE, slope_lower.CL, slope_upper.CL, p.value) %>%
   tibble()
 
@@ -452,7 +665,7 @@ acetate_plot <- acetate_plot +
          x = Inf, y = Inf,
          hjust = 1.1, vjust = 1.5,
          label = paste0("Marginal slope\np = ",
-                        signif(trend_results$p.value[trend_results$response_var=="acetate"], 1)),
+                        signif(trend_results$p.value[trend_results$response_var=="acetate"])),
          size = 4,
          color = "red")
 
@@ -520,6 +733,5 @@ xaxis_label <- xaxis_label + labs(tag = NULL)
 # ---- Design multi-panel figure ----
 (acetate_plot + butyrate_plot + propionate_plot) / xaxis_label +
   plot_layout(heights = c(1, 0.001))  # smaller relative height for x-axis label
-#plot_annotation(tag_levels = 'A')
 
-#ggsave("figures/SCFA~habitualB12.pdf", width = 12, height = 5)
+# ggsave("figures/SCFA~habitualB12.pdf", width = 12, height = 5)

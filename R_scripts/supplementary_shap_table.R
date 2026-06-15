@@ -1,5 +1,6 @@
 
 # --- Set up ----
+
 library(shapviz)
 library(dplyr)
 library(tidyr)
@@ -66,11 +67,12 @@ process_shap_file <- function(file_path) {
 }
 
 # ---- Batch process files ----
+
 shap_files <- list.files("/Users/local-margaret/Desktop/VB12-analysis/data/SHAP_objects/intake_subset",
                          full.names = TRUE)
 
+# These are the models that performed well, but that aren't worth visualizing as bee swarm plots 
 shap_files
-# will need to add other models, as they performed equally as well 
 
 all_beeswarm_tbl <- bind_rows(lapply(shap_files, process_shap_file))
 
@@ -81,41 +83,4 @@ unique(all_beeswarm_tbl$response)
 View(all_beeswarm_tbl)
 
 # Write the entire giant file
-#readr::write_csv(all_beeswarm_tbl, "data/supplementary_shap_table.csv")
-
-# separate tibbles by metadata
-grouped_tables <- all_beeswarm_tbl %>%
-  group_by(predictor, response, subgroup) %>%
-  group_split()
-
-group_keys <- purrr::map_dfr(
-  grouped_tables,
-  ~ distinct(.x, predictor, response, subgroup))
-
-setwd("/Users/local-margaret/Desktop/VB12-analysis")
-output_dir <- "data/beeswarm_tables"
-dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
-
-all_beeswarm_tbl %>%
-  group_by(predictor, response, subgroup) %>%
-  group_walk(~ {
-    
-    tbl_out <- .x %>%
-      mutate(
-        predictor = .y$predictor,
-        response  = .y$response,
-        subgroup  = .y$subgroup
-      )
-    
-    file_name <- sprintf(
-      "beeswarm_%s_%s_%s.csv",
-      .y$predictor,
-      .y$response,
-      .y$subgroup
-    )
-    
-    readr::write_csv(
-      tbl_out,
-      file.path(output_dir, file_name)
-    )
-  })
+readr::write_csv(all_beeswarm_tbl, "data/supplementary_table9.csv")
